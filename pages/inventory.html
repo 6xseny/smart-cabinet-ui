@@ -1,0 +1,762 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>库存查询 - 智能柜后台管理系统</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+        /* 用户下拉菜单样式 */
+        .user-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 220px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all var(--transition-fast);
+            z-index: 1000;
+        }
+
+        .user-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+        }
+
+        .user-menu-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .user-menu-info {
+            flex: 1;
+        }
+
+        .user-menu-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+        }
+
+        .user-menu-role {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: var(--space-2) 0;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .user-menu-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .user-menu-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .user-menu-item.logout {
+            color: var(--danger-500);
+        }
+
+        .user-menu-item.logout:hover {
+            background: var(--danger-500);
+            color: white;
+        }
+
+        /* 下拉箭头旋转动画 */
+        .user-dropdown .fa-chevron-down {
+            transition: transform var(--transition-fast);
+        }
+
+        .user-dropdown.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+</style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-cube"></i>
+                    <span>智能柜系统</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>工作台</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="device-monitor.html" class="nav-link">
+                            <i class="fas fa-desktop"></i>
+                            <span>设备监控中心</span>
+                        </a>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>基础管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="product.html">商品档案</a></li>
+                            <li><a href="supplier.html">供应商管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-qrcode"></i>
+                            <span>赋码管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="coding-task.html">赋码任务</a></li>
+                            <li><a href="code-contrast.html">标签对照</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>系统管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="organization.html">组织架构</a></li>
+                            <li><a href="device.html">设备管理</a></li>
+                            <li><a href="user.html">用户权限</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu active">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-warehouse"></i>
+                            <span>库存管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu show">
+                            <li><a href="inventory.html" class="active">库存查询</a></li>
+                            <li><a href="warning.html">库存预警</a></li>
+                            <li><a href="replenish.html">补货管理</a></li>
+                            <li><a href="stocktaking.html">盘点管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>查询统计</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="query.html">业务查询</a></li>
+                            <li><a href="report.html">统计报表</a></li>
+                            <li><a href="trace.html">追溯中心</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航 -->
+            <header class="top-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <span>库存管理</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <span class="current">库存查询</span>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="全局搜索...">
+                    </div>
+                    <div class="header-actions">
+                        <button class="action-btn" onclick="location.href='todo-list.html'" title="待办事项">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown" style="position:relative;">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-avatar">
+                            <span class="user-name">系统管理员</span>
+                            <i class="fas fa-chevron-down"></i>
+                            <!-- 用户下拉菜单 -->
+                            <div class="user-menu" id="userMenu">
+                                <div class="user-menu-header">
+                                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-menu-avatar">
+                                    <div class="user-menu-info">
+                                        <div class="user-menu-name">系统管理员</div>
+                                        <div class="user-menu-role">超级管理员</div>
+                                    </div>
+                                </div>
+                                <div class="user-menu-divider"></div>
+                                <a href="javascript:void(0);" class="user-menu-item" onclick="openPersonalSettingsModal()">
+                                    <i class="fas fa-user-cog"></i>
+                                    <span>个人设置</span>
+                                </a>
+                                <div class="user-menu-divider"></div>
+                                <a href="../login.html" class="user-menu-item logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>退出登录</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <!-- 页面标题 -->
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">库存查询</h1>
+                        <p class="page-desc">实时查询各智能柜、各科室的库存情况，支持多维度筛选和导出</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-file-export"></i>
+                            导出报表
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 库存概览卡片 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-cubes"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">45,280</div>
+                            <div class="stat-label">总库存量</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-warehouse"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">128</div>
+                            <div class="stat-label">智能柜数量</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">23</div>
+                            <div class="stat-label">库存预警</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <i class="fas fa-calendar-times"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">156</div>
+                            <div class="stat-label">临期商品</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 智能柜分布 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-server"></i>
+                            智能柜库存分布
+                        </h3>
+                        <div class="card-actions">
+                            <button class="btn btn-text" onclick="openViewAllCabinetsModal()">
+                                <i class="fas fa-expand"></i>
+                                查看全部
+                            </button>
+                        </div>
+                    </div>
+                    <div class="cabinet-grid">
+                        <div class="cabinet-card">
+                            <div class="cabinet-header">
+                                <div class="cabinet-icon">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="cabinet-info">
+                                    <div class="cabinet-name">手术室-01号柜</div>
+                                    <div class="cabinet-location">3号楼 2层 手术室A区</div>
+                                </div>
+                                <span class="cabinet-status online">在线</span>
+                            </div>
+                            <div class="cabinet-stats">
+                                <div class="stat-item">
+                                    <div class="stat-num">1,250</div>
+                                    <div class="stat-label">库存量</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-num">45</div>
+                                    <div class="stat-label">SKU数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-num warning">3</div>
+                                    <div class="stat-label">预警</div>
+                                </div>
+                            </div>
+                            <div class="cabinet-progress">
+                                <div class="progress-info">
+                                    <span>货道使用率</span>
+                                    <span>78%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 78%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cabinet-card">
+                            <div class="cabinet-header">
+                                <div class="cabinet-icon">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="cabinet-info">
+                                    <div class="cabinet-name">急诊科-01号柜</div>
+                                    <div class="cabinet-location">1号楼 1层 急诊大厅</div>
+                                </div>
+                                <span class="cabinet-status online">在线</span>
+                            </div>
+                            <div class="cabinet-stats">
+                                <div class="stat-item">
+                                    <div class="stat-num">980</div>
+                                    <div class="stat-label">库存量</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-num">38</div>
+                                    <div class="stat-label">SKU数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-num warning">5</div>
+                                    <div class="stat-label">预警</div>
+                                </div>
+                            </div>
+                            <div class="cabinet-progress">
+                                <div class="progress-info">
+                                    <span>货道使用率</span>
+                                    <span>65%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 65%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cabinet-card">
+                            <div class="cabinet-header">
+                                <div class="cabinet-icon">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="cabinet-info">
+                                    <div class="cabinet-name">ICU-01号柜</div>
+                                    <div class="cabinet-location">2号楼 5层 ICU病区</div>
+                                </div>
+                                <span class="cabinet-status online">在线</span>
+                            </div>
+                            <div class="cabinet-stats">
+                                <div class="stat-item">
+                                    <div class="stat-num">1,580</div>
+                                    <div class="stat-label">库存量</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-num">52</div>
+                                    <div class="stat-label">SKU数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-num">0</div>
+                                    <div class="stat-label">预警</div>
+                                </div>
+                            </div>
+                            <div class="cabinet-progress">
+                                <div class="progress-info">
+                                    <span>货道使用率</span>
+                                    <span>82%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width: 82%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="cabinet-card">
+                            <div class="cabinet-header">
+                                <div class="cabinet-icon">
+                                    <i class="fas fa-server"></i>
+                                </div>
+                                <div class="cabinet-info">
+                                    <div class="cabinet-name">药房-02号柜</div>
+                                    <div class="cabinet-location">1号楼 1层 中心药房</div>
+                                </div>
+                                <span class="cabinet-status offline">离线</span>
+                            </div>
+                            <div class="cabinet-stats">
+                                <div class="stat-item">
+                                    <div class="stat-num">2,150</div>
+                                    <div class="stat-label">库存量</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-num">68</div>
+                                    <div class="stat-label">SKU数</div>
+                                </div>
+                                <div class="stat-item">
+                                    <div class="stat-num warning">8</div>
+                                    <div class="stat-label">预警</div>
+                                </div>
+                            </div>
+                            <div class="cabinet-progress">
+                                <div class="progress-info">
+                                    <span>货道使用率</span>
+                                    <span>91%</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill warning" style="width: 91%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 筛选区域 -->
+                <div class="filter-section">
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <label>所属院区</label>
+                            <select class="form-select">
+                                <option value="">全部院区</option>
+                                <option value="main">主院区</option>
+                                <option value="east">东院区</option>
+                                <option value="west">西院区</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>所属科室</label>
+                            <select class="form-select">
+                                <option value="">全部科室</option>
+                                <option value="surgery">手术室</option>
+                                <option value="emergency">急诊科</option>
+                                <option value="icu">ICU</option>
+                                <option value="pharmacy">药房</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>智能柜</label>
+                            <select class="form-select">
+                                <option value="">全部设备</option>
+                                <option value="cab01">手术室-01号柜</option>
+                                <option value="cab02">急诊科-01号柜</option>
+                                <option value="cab03">ICU-01号柜</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>商品类型</label>
+                            <select class="form-select">
+                                <option value="">全部</option>
+                                <option value="consumable">耗材</option>
+                                <option value="drug">药品</option>
+                            </select>
+                        </div>
+                        <div class="filter-item search-item">
+                            <label>关键词搜索</label>
+                            <div class="search-input-group">
+                                <input type="text" class="form-input" placeholder="商品名称/编码">
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-text">
+                            <i class="fas fa-undo"></i>
+                            重置
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-filter"></i>
+                            筛选
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 库存明细表格 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list-alt"></i>
+                            库存明细
+                        </h3>
+                        <div class="card-actions">
+                            <button class="btn btn-text" title="刷新">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-text" title="列设置">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="40">
+                                        <input type="checkbox" class="checkbox-all">
+                                    </th>
+                                    <th>商品编码</th>
+                                    <th>商品名称</th>
+                                    <th>规格</th>
+                                    <th>所属科室</th>
+                                    <th>智能柜</th>
+                                    <th>货道号</th>
+                                    <th>库存数量</th>
+                                    <th>安全库存</th>
+                                    <th>库存状态</th>
+                                    <th>效期预警</th>
+                                    <th width="120">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox-item"></td>
+                                    <td><span class="code">SP20240001</span></td>
+                                    <td>一次性使用无菌注射器</td>
+                                    <td>5ml 带针</td>
+                                    <td>手术室</td>
+                                    <td>手术室-01号柜</td>
+                                    <td>A-01-03</td>
+                                    <td><strong>256</strong></td>
+                                    <td>100</td>
+                                    <td><span class="badge badge-green">充足</span></td>
+                                    <td><span class="badge badge-green">正常</span></td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-icon" title="详情"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon" title="补货"><i class="fas fa-plus"></i></button>
+                                            <button class="btn-icon" title="调拨"><i class="fas fa-exchange-alt"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox-item"></td>
+                                    <td><span class="code">SP20240002</span></td>
+                                    <td>头孢呋辛钠注射液</td>
+                                    <td>0.75g/瓶</td>
+                                    <td>急诊科</td>
+                                    <td>急诊科-01号柜</td>
+                                    <td>B-02-01</td>
+                                    <td><strong class="text-warning">18</strong></td>
+                                    <td>50</td>
+                                    <td><span class="badge badge-orange">不足</span></td>
+                                    <td><span class="badge badge-green">正常</span></td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-icon" title="详情"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon primary" title="补货"><i class="fas fa-plus"></i></button>
+                                            <button class="btn-icon" title="调拨"><i class="fas fa-exchange-alt"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox-item"></td>
+                                    <td><span class="code">SP20240003</span></td>
+                                    <td>医用纱布块</td>
+                                    <td>8×10cm 灭菌</td>
+                                    <td>ICU</td>
+                                    <td>ICU-01号柜</td>
+                                    <td>C-03-05</td>
+                                    <td><strong>520</strong></td>
+                                    <td>200</td>
+                                    <td><span class="badge badge-green">充足</span></td>
+                                    <td><span class="badge badge-orange">临期</span></td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-icon" title="详情"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon" title="补货"><i class="fas fa-plus"></i></button>
+                                            <button class="btn-icon" title="调拨"><i class="fas fa-exchange-alt"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox-item"></td>
+                                    <td><span class="code">SP20240005</span></td>
+                                    <td>氯化钠注射液</td>
+                                    <td>0.9% 250ml</td>
+                                    <td>急诊科</td>
+                                    <td>急诊科-01号柜</td>
+                                    <td>B-01-02</td>
+                                    <td><strong class="text-danger">5</strong></td>
+                                    <td>30</td>
+                                    <td><span class="badge badge-red">紧缺</span></td>
+                                    <td><span class="badge badge-green">正常</span></td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-icon" title="详情"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon primary" title="补货"><i class="fas fa-plus"></i></button>
+                                            <button class="btn-icon" title="调拨"><i class="fas fa-exchange-alt"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox-item"></td>
+                                    <td><span class="code">SP20240007</span></td>
+                                    <td>阿莫西林胶囊</td>
+                                    <td>0.25g×24粒</td>
+                                    <td>药房</td>
+                                    <td>药房-02号柜</td>
+                                    <td>D-04-01</td>
+                                    <td><strong>180</strong></td>
+                                    <td>100</td>
+                                    <td><span class="badge badge-green">充足</span></td>
+                                    <td><span class="badge badge-red">过期</span></td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-icon" title="详情"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon" title="补货"><i class="fas fa-plus"></i></button>
+                                            <button class="btn-icon danger" title="报废"><i class="fas fa-trash"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <div class="pagination-info">
+                            共 <strong>2,580</strong> 条记录，每页
+                            <select class="page-size">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                                <option value="100">100</option>
+                            </select>
+                            条
+                        </div>
+                        <div class="pagination-nav">
+                            <button class="btn btn-text" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-primary active">1</button>
+                            <button class="btn btn-text">2</button>
+                            <button class="btn btn-text">3</button>
+                            <span class="pagination-ellipsis">...</span>
+                            <button class="btn btn-text">129</button>
+                            <button class="btn btn-text">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 菜单切换
+        document.querySelectorAll('.nav-item.has-submenu > .nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const parent = link.parentElement;
+                parent.classList.toggle('active');
+                const submenu = parent.querySelector('.submenu');
+                submenu.classList.toggle('show');
+            });
+        });
+
+        // 侧边栏折叠
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        });
+
+        // 全选
+        document.querySelector('.checkbox-all').addEventListener('change', function() {
+            document.querySelectorAll('.checkbox-item').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+    
+    // 用户下拉菜单交互
+    const userDropdown = document.getElementById('userDropdown');
+    const userMenu = document.getElementById('userMenu');
+
+    if (userDropdown && userMenu) {
+        userDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+            userMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('active');
+                userMenu.classList.remove('show');
+            }
+        });
+
+        const logoutBtn = document.querySelector('.user-menu-item.logout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (typeof Modal !== 'undefined') {
+                    Modal.confirm('确定要退出登录吗？', () => {
+                        window.location.href = logoutBtn.getAttribute('href');
+                    });
+                } else {
+                    if (confirm('确定要退出登录吗？')) {
+                        window.location.href = logoutBtn.getAttribute('href');
+                    }
+                }
+            });
+        }
+    }
+</script>
+    <script src="../js/app.js"></script>
+    <script src="../js/page-enhance.js"></script>
+</body>
+</html>

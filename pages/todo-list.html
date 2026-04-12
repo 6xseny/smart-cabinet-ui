@@ -1,0 +1,698 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能柜后台管理系统 - 待办事项</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ---- 待办事项页特有样式 ---- */
+        .todo-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-5);
+            margin-bottom: var(--space-6);
+        }
+
+        .todo-sum-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            transition: all var(--transition-fast);
+            cursor: pointer;
+        }
+        .todo-sum-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+
+        .ts-icon {
+            width: 48px; height: 48px;
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.2rem;
+            flex-shrink: 0;
+        }
+        .ts-icon.all    { background: rgba(0,191,255,0.12); color: var(--primary-400); }
+        .ts-icon.urgent { background: rgba(255,51,102,0.12); color: var(--error); }
+        .ts-icon.warn   { background: rgba(255,204,0,0.12);  color: var(--warning); }
+        .ts-icon.normal { background: rgba(0,191,255,0.08);  color: var(--primary-400); }
+
+        .ts-info { flex: 1; }
+        .ts-val   { font-size: 1.6rem; font-weight: var(--font-bold); color: var(--text-primary); line-height: 1; margin-bottom: 4px; }
+        .ts-label { font-size: var(--text-sm); color: var(--text-tertiary); }
+
+        /* 工具栏 */
+        .todo-toolbar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-5);
+            flex-wrap: wrap;
+        }
+        .todo-toolbar-left  { display: flex; align-items: center; gap: var(--space-3); flex: 1; flex-wrap: wrap; }
+        .todo-toolbar-right { display: flex; align-items: center; gap: var(--space-3); }
+
+        .tb-btn {
+            display: flex; align-items: center; gap: var(--space-2);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .tb-btn:hover, .tb-btn.active { border-color: var(--primary-500); color: var(--primary-400); background: rgba(0,191,255,0.08); }
+        .tb-btn .cnt { background: var(--primary-500); color: #fff; border-radius: var(--radius-full); padding: 1px 7px; font-size: var(--text-xs); font-weight: 600; }
+        .tb-btn.urgent-btn.active { border-color: var(--error); color: var(--error); background: rgba(255,51,102,0.08); }
+        .tb-btn.urgent-btn .cnt { background: var(--error); }
+        .tb-btn.warn-btn.active { border-color: var(--warning); color: var(--warning); background: rgba(255,204,0,0.08); }
+        .tb-btn.warn-btn .cnt { background: var(--warning); color: #000; }
+
+        /* 待办列表 */
+        .todo-full-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .todo-full-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4) var(--space-5);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-lg);
+            border-left: 4px solid var(--border-color);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+        }
+        .todo-full-item.urgent { border-left-color: var(--error); }
+        .todo-full-item.warning { border-left-color: var(--warning); }
+        .todo-full-item.normal  { border-left-color: var(--primary-500); }
+        .todo-full-item.done    { border-left-color: var(--success); opacity: 0.6; }
+        .todo-full-item:hover:not(.done) { background: rgba(14,165,233,0.08); transform: translateX(4px); }
+
+        .tfi-icon {
+            width: 44px; height: 44px;
+            border-radius: var(--radius-md);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+        .todo-full-item.urgent  .tfi-icon { background: rgba(255,51,102,0.12); color: var(--error); }
+        .todo-full-item.warning .tfi-icon { background: rgba(255,204,0,0.12);  color: var(--warning); }
+        .todo-full-item.normal  .tfi-icon { background: rgba(0,191,255,0.10);  color: var(--primary-400); }
+        .todo-full-item.done    .tfi-icon { background: rgba(0,255,136,0.10);  color: var(--success); }
+
+        .tfi-body { flex: 1; min-width: 0; }
+        .tfi-title {
+            font-size: var(--text-sm);
+            font-weight: var(--font-semibold);
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        .todo-full-item.done .tfi-title { text-decoration: line-through; color: var(--text-tertiary); }
+        .tfi-desc { font-size: var(--text-xs); color: var(--text-tertiary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+
+        .tfi-meta {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 4px;
+            flex-shrink: 0;
+        }
+        .tfi-time { font-size: var(--text-xs); color: var(--text-tertiary); }
+        .tfi-tag {
+            font-size: 10px;
+            padding: 2px 8px;
+            border-radius: var(--radius-full);
+            font-weight: var(--font-medium);
+        }
+        .tfi-tag.urgent  { background: rgba(255,51,102,0.15); color: var(--error); }
+        .tfi-tag.warning { background: rgba(255,204,0,0.15);  color: var(--warning); }
+        .tfi-tag.normal  { background: rgba(0,191,255,0.12);  color: var(--primary-400); }
+        .tfi-tag.done    { background: rgba(0,255,136,0.12);  color: var(--success); }
+
+        .tfi-action {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            flex-shrink: 0;
+        }
+        .act-btn {
+            width: 30px; height: 30px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border-color);
+            background: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 0.8rem;
+            transition: all var(--transition-fast);
+        }
+        .act-btn:hover { border-color: var(--primary-500); color: var(--primary-400); }
+        .act-btn.done-btn:hover { border-color: var(--success); color: var(--success); }
+
+        .priority-dot {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            flex-shrink: 0;
+        }
+        .priority-dot.urgent  { background: var(--error);   box-shadow: 0 0 6px var(--error); }
+        .priority-dot.warning { background: var(--warning); box-shadow: 0 0 6px var(--warning); animation: pulse-warn 1.5s infinite; }
+        .priority-dot.normal  { background: var(--primary-500); }
+        .priority-dot.done    { background: var(--success); }
+
+        @keyframes pulse-warn {
+            0%,100% { box-shadow: 0 0 4px var(--warning); }
+            50%      { box-shadow: 0 0 10px var(--warning); }
+        }
+
+        /* 空态 */
+        .empty-state { text-align: center; padding: 60px 0; color: var(--text-tertiary); }
+        .empty-state i { font-size: 2.5rem; margin-bottom: 12px; opacity: .3; }
+
+        /* 响应式 */
+        @media (max-width: 1200px) { .todo-summary { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px) {
+            .todo-summary { grid-template-columns: 1fr 1fr; }
+            .tfi-action { display: none; }
+        }
+
+        .user-dropdown.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+    
+        /* 用户下拉菜单样式 */
+        .user-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 220px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all var(--transition-fast);
+            z-index: 1000;
+        }
+
+        .user-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+        }
+
+        .user-menu-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .user-menu-info {
+            flex: 1;
+        }
+
+        .user-menu-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+        }
+
+        .user-menu-role {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: var(--space-2) 0;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .user-menu-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .user-menu-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .user-menu-item.logout {
+            color: var(--danger-500);
+        }
+
+        .user-menu-item.logout:hover {
+            background: var(--danger-500);
+            color: white;
+        }
+
+        /* 下拉箭头旋转动画 */
+        .user-dropdown .fa-chevron-down {
+            transition: transform var(--transition-fast);
+        }
+
+        .user-dropdown.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+</style>
+</head>
+<body>
+<div class="app-container">
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>智能柜系统</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>工作台</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="device-monitor.html" class="nav-link">
+                        <i class="fas fa-desktop"></i>
+                        <span>设备监控中心</span>
+                    </a>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        <span>基础管理</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="product.html">商品档案</a></li>
+                        <li><a href="supplier.html">供应商管理</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-qrcode"></i>
+                        <span>赋码管理</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="coding-task.html">赋码任务</a></li>
+                        <li><a href="code-contrast.html">标签对照</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>系统管理</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="organization.html">组织架构</a></li>
+                        <li><a href="device.html">设备管理</a></li>
+                        <li><a href="user.html">用户权限</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-warehouse"></i>
+                        <span>库存管理</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="inventory.html">库存查询</a></li>
+                        <li><a href="warning.html">库存预警</a></li>
+                        <li><a href="replenish.html">补货管理</a></li>
+                        <li><a href="stocktaking.html">盘点管理</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>查询统计</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="query.html">业务查询</a></li>
+                        <li><a href="report.html">统计报表</a></li>
+                        <li><a href="trace.html">追溯中心</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <header class="top-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="breadcrumb">
+                <a href="../index.html" style="color:var(--text-secondary);text-decoration:none;">首页</a>
+                <i class="fas fa-chevron-right"></i>
+                <a href="../index.html" style="color:var(--text-secondary);text-decoration:none;">工作台</a>
+                <i class="fas fa-chevron-right"></i>
+                <span class="current">待办事项</span>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="全局搜索...">
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn" onclick="location.href='todo-list.html'" title="待办事项">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge"></span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown" style="position:relative;">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-avatar">
+                        <span class="user-name">系统管理员</span>
+                        <i class="fas fa-chevron-down"></i>
+                        <!-- 用户下拉菜单 -->
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-menu-header">
+                                <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-menu-avatar">
+                                <div class="user-menu-info">
+                                    <div class="user-menu-name">系统管理员</div>
+                                    <div class="user-menu-role">超级管理员</div>
+                                </div>
+                            </div>
+                            <div class="user-menu-divider"></div>
+                            <a href="javascript:void(0);" class="user-menu-item" onclick="openPersonalSettingsModal()">
+                                <i class="fas fa-user-cog"></i>
+                                <span>个人设置</span>
+                            </a>
+                            <div class="user-menu-divider"></div>
+                            <a href="../login.html" class="user-menu-item logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>退出登录</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <!-- 页面标题 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-6);">
+                <div>
+                    <h2 style="font-size:var(--text-xl);font-weight:var(--font-semibold);color:var(--text-primary);margin-bottom:4px;display:flex;align-items:center;gap:var(--space-3);">
+                        <i class="fas fa-list-check" style="color:var(--primary-400);"></i>
+                        待办事项
+                    </h2>
+                    <p style="font-size:var(--text-sm);color:var(--text-tertiary);">汇总系统待处理任务，及时响应异常与审核需求</p>
+                </div>
+                <button class="btn btn-primary" onclick="addTodoModal()">
+                    <i class="fas fa-plus" style="margin-right:6px;"></i>新增待办
+                </button>
+            </div>
+
+            <!-- 统计卡片 -->
+            <div class="todo-summary">
+                <div class="todo-sum-card" onclick="filterTodo('all')">
+                    <div class="ts-icon all"><i class="fas fa-list-check"></i></div>
+                    <div class="ts-info">
+                        <div class="ts-val" id="statTotal">16</div>
+                        <div class="ts-label">全部待办</div>
+                    </div>
+                </div>
+                <div class="todo-sum-card" onclick="filterTodo('urgent')">
+                    <div class="ts-icon urgent"><i class="fas fa-fire"></i></div>
+                    <div class="ts-info">
+                        <div class="ts-val" style="color:var(--error);" id="statUrgent">4</div>
+                        <div class="ts-label">紧急处理</div>
+                    </div>
+                </div>
+                <div class="todo-sum-card" onclick="filterTodo('warning')">
+                    <div class="ts-icon warn"><i class="fas fa-clock"></i></div>
+                    <div class="ts-info">
+                        <div class="ts-val" style="color:var(--warning);" id="statWarn">7</div>
+                        <div class="ts-label">待处理</div>
+                    </div>
+                </div>
+                <div class="todo-sum-card" onclick="filterTodo('done')">
+                    <div class="ts-icon normal"><i class="fas fa-check-circle"></i></div>
+                    <div class="ts-info">
+                        <div class="ts-val" style="color:var(--success);" id="statDone">5</div>
+                        <div class="ts-label">已完成</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="todo-toolbar">
+                <div class="todo-toolbar-left">
+                    <button class="tb-btn active" id="tbAll"     onclick="filterTodo('all')"><i class="fas fa-th-list"></i> 全部 <span class="cnt" id="cntAll">16</span></button>
+                    <button class="tb-btn urgent-btn" id="tbUrgent" onclick="filterTodo('urgent')"><i class="fas fa-fire" style="color:var(--error);"></i> 紧急 <span class="cnt" id="cntUrgent">4</span></button>
+                    <button class="tb-btn warn-btn" id="tbWarn"  onclick="filterTodo('warning')"><i class="fas fa-clock" style="color:var(--warning);"></i> 待处理 <span class="cnt" id="cntWarn">7</span></button>
+                    <button class="tb-btn" id="tbNormal" onclick="filterTodo('normal')"><i class="fas fa-info-circle" style="color:var(--primary-400);"></i> 普通 <span class="cnt">5</span></button>
+                    <button class="tb-btn" id="tbDone"   onclick="filterTodo('done')"><i class="fas fa-check-circle" style="color:var(--success);"></i> 已完成 <span class="cnt" style="background:var(--success);">5</span></button>
+                </div>
+                <div class="todo-toolbar-right">
+                    <select id="typeFilter" onchange="applyFilters()" style="padding:8px 14px;border-radius:var(--radius-md);border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);font-size:var(--text-sm);outline:none;cursor:pointer;">
+                        <option value="">全部类型</option>
+                        <option value="库存">库存相关</option>
+                        <option value="设备">设备相关</option>
+                        <option value="盘点">盘点相关</option>
+                        <option value="赋码">赋码相关</option>
+                        <option value="审核">审核相关</option>
+                        <option value="补货">补货相关</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 待办列表 -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="todo-full-list" id="todoList"></div>
+                    <div class="empty-state" id="emptyState" style="display:none;">
+                        <i class="fas fa-check-double"></i>
+                        <div>暂无符合条件的待办事项</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<script src="../js/app.js">
+    // 用户下拉菜单交互
+    const userDropdown = document.getElementById('userDropdown');
+    const userMenu = document.getElementById('userMenu');
+
+    if (userDropdown && userMenu) {
+        userDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+            userMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('active');
+                userMenu.classList.remove('show');
+            }
+        });
+
+        const logoutBtn = document.querySelector('.user-menu-item.logout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (typeof Modal !== 'undefined') {
+                    Modal.confirm('确定要退出登录吗？', () => {
+                        window.location.href = logoutBtn.getAttribute('href');
+                    });
+                } else {
+                    if (confirm('确定要退出登录吗？')) {
+                        window.location.href = logoutBtn.getAttribute('href');
+                    }
+                }
+            });
+        }
+    }
+</script>
+<script>
+const TODOS = [
+    { id:1, level:'urgent', type:'库存', icon:'fa-exclamation-triangle', title:'库存预警处理', desc:'23个商品库存低于安全线，需立即处理补货', time:'2小时前', date:'今天 08:10', done:false, link:'warning.html', handler:'库管员' },
+    { id:2, level:'urgent', type:'设备', icon:'fa-times-circle', title:'设备离线告警', desc:'骨科副柜D05网络断开，已离线超过2小时', time:'2小时前', date:'今天 08:15', done:false, link:'device-monitor.html', handler:'IT运维' },
+    { id:3, level:'urgent', type:'设备', icon:'fa-thermometer-half', title:'ICU设备温度异常', desc:'ICU-主柜-C02温度超过阈值，当前42°C', time:'30分钟前', date:'今天 09:50', done:false, link:'device-monitor.html', handler:'IT运维' },
+    { id:4, level:'urgent', type:'库存', icon:'fa-battery-empty', title:'呼吸科库存严重不足', desc:'呼吸科-副柜-H03库存仅剩18件，远低于安全线', time:'20分钟前', date:'今天 10:00', done:false, link:'replenish.html', handler:'库管员' },
+    { id:5, level:'warning', type:'盘点', icon:'fa-clipboard-list', title:'手术室月度盘点待执行', desc:'手术室月度盘点任务截止今日，请及时完成', time:'今天', date:'今天', done:false, link:'stocktaking.html', handler:'库管员' },
+    { id:6, level:'warning', type:'赋码', icon:'fa-calendar', title:'赋码加工单审核', desc:'3张赋码加工单待审核，已超1天未处理', time:'昨天', date:'昨天 15:30', done:false, link:'coding-task.html', handler:'质量主管' },
+    { id:7, level:'warning', type:'补货', icon:'fa-truck', title:'补货计划待确认', desc:'5个科室提交了补货申请，需审批确认', time:'昨天', date:'昨天 14:00', done:false, link:'replenish.html', handler:'采购主管' },
+    { id:8, level:'warning', type:'审核', icon:'fa-file-signature', title:'库存盘点差异审核', desc:'急诊科上月盘点差异报告待审批', time:'2天前', date:'04-08 10:00', done:false, link:'stocktaking.html', handler:'库管主管' },
+    { id:9, level:'warning', type:'设备', icon:'fa-tools', title:'ICU设备固件升级', desc:'ICU-主柜-C02固件版本过旧(v2.2.9)，需升级', time:'3天前', date:'04-07 09:00', done:false, link:'device.html', handler:'IT运维' },
+    { id:10, level:'warning', type:'库存', icon:'fa-box-open', title:'骨科手术备料库存预警', desc:'骨科-主柜-D02库存48件，低于阈值60件', time:'3天前', date:'04-07 08:30', done:false, link:'warning.html', handler:'库管员' },
+    { id:11, level:'warning', type:'审核', icon:'fa-user-check', title:'新用户权限申请审核', desc:'2名新护士提交了智能柜操作权限申请', time:'4天前', date:'04-06 15:00', done:false, link:'user.html', handler:'系统管理员' },
+    { id:12, level:'normal', type:'盘点', icon:'fa-clipboard-check', title:'儿科季度盘点准备', desc:'儿科季度盘点计划下周一启动，需提前备料', time:'4天前', date:'04-06 11:00', done:false, link:'stocktaking.html', handler:'库管员' },
+    { id:13, level:'done', type:'库存', icon:'fa-check', title:'心内科补货已完成', desc:'心内科-主柜-E01本月补货任务已执行完毕', time:'2天前', date:'04-08 14:00', done:true, link:'inventory.html', handler:'库管员' },
+    { id:14, level:'done', type:'设备', icon:'fa-check', title:'门诊药房设备重启完成', desc:'门诊药房-副柜-L03网络重启后恢复正常', time:'3天前', date:'04-07 16:00', done:true, link:'device-monitor.html', handler:'IT运维' },
+    { id:15, level:'done', type:'赋码', icon:'fa-check', title:'骨科赋码单已审核', desc:'骨科4月第1批赋码任务审核已通过', time:'4天前', date:'04-06 09:00', done:true, link:'coding-task.html', handler:'质量主管' },
+    { id:16, level:'done', type:'盘点', icon:'fa-check', title:'神经外科盘点已完成', desc:'神经外科3月盘点任务顺利完成，差异率0.3%', time:'5天前', date:'04-05 17:00', done:true, link:'stocktaking.html', handler:'库管员' },
+    { id:17, level:'done', type:'补货', icon:'fa-check', title:'急诊室紧急补货完成', desc:'急诊室抢救备药补货已到位，库存恢复正常', time:'5天前', date:'04-05 12:00', done:true, link:'replenish.html', handler:'采购主管' },
+    { id:18, level:'normal', type:'库存', icon:'fa-chart-bar', title:'4月库存报表生成', desc:'需在月底前生成4月份库存汇总报表', time:'5天前', date:'04-05 09:00', done:false, link:'report.html', handler:'库管主管' },
+    { id:19, level:'normal', type:'审核', icon:'fa-file-alt', title:'供应商资质定期审核', desc:'3家供应商资质证件到期，需更新审核', time:'6天前', date:'04-04 14:00', done:false, link:'supplier.html', handler:'采购主管' },
+    { id:20, level:'normal', type:'设备', icon:'fa-calendar-alt', title:'设备年度维保计划', desc:'制定全院智能柜年度维护保养计划', time:'6天前', date:'04-04 10:00', done:false, link:'device.html', handler:'IT运维' },
+];
+
+let currentFilter = 'all';
+let currentType = '';
+
+function renderList() {
+    const typeFilter = document.getElementById('typeFilter').value;
+    const list = document.getElementById('todoList');
+    const empty = document.getElementById('emptyState');
+
+    const data = TODOS.filter(t => {
+        let matchFilter = true;
+        if (currentFilter === 'urgent')  matchFilter = t.level === 'urgent' && !t.done;
+        else if (currentFilter === 'warning') matchFilter = t.level === 'warning' && !t.done;
+        else if (currentFilter === 'normal')  matchFilter = t.level === 'normal' && !t.done;
+        else if (currentFilter === 'done')    matchFilter = t.done;
+        else matchFilter = !t.done || currentFilter === 'all';
+        const matchType = !typeFilter || t.type.includes(typeFilter);
+        return matchFilter && matchType;
+    });
+
+    if (data.length === 0) {
+        list.innerHTML = '';
+        empty.style.display = 'block';
+        return;
+    }
+    empty.style.display = 'none';
+
+    const levelLabel = { urgent:'紧急', warning:'待处理', normal:'普通', done:'已完成' };
+    list.innerHTML = data.map(t => `
+        <div class="todo-full-item ${t.done ? 'done' : t.level}" onclick="handleClick(${t.id})">
+            <div class="tfi-icon"><i class="fas ${t.icon}"></i></div>
+            <div class="tfi-body">
+                <div class="tfi-title">
+                    <span class="priority-dot ${t.done ? 'done' : t.level}"></span>
+                    ${t.title}
+                    ${t.done ? '<span style="font-size:10px;color:var(--success);font-weight:400;">(已完成)</span>' : ''}
+                </div>
+                <div class="tfi-desc">${t.desc}</div>
+                <div style="display:flex;gap:var(--space-3);margin-top:5px;font-size:10px;color:var(--text-tertiary);">
+                    <span><i class="fas fa-user" style="margin-right:3px;"></i>${t.handler}</span>
+                    <span><i class="fas fa-tag" style="margin-right:3px;"></i>${t.type}</span>
+                    <span><i class="fas fa-calendar" style="margin-right:3px;"></i>${t.date}</span>
+                </div>
+            </div>
+            <div class="tfi-meta">
+                <div class="tfi-tag ${t.done ? 'done' : t.level}">${levelLabel[t.done ? 'done' : t.level]}</div>
+                <div class="tfi-time">${t.time}</div>
+            </div>
+            <div class="tfi-action" onclick="event.stopPropagation()">
+                ${!t.done ? `<button class="act-btn done-btn" title="标记完成" onclick="markDone(${t.id})"><i class="fas fa-check"></i></button>` : ''}
+                <button class="act-btn" title="查看详情" onclick="location.href='${t.link}'"><i class="fas fa-arrow-right"></i></button>
+            </div>
+        </div>
+    `).join('');
+}
+
+function filterTodo(type) {
+    currentFilter = type;
+    ['tbAll','tbUrgent','tbWarn','tbNormal','tbDone'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+    const map = { all:'tbAll', urgent:'tbUrgent', warning:'tbWarn', normal:'tbNormal', done:'tbDone' };
+    document.getElementById(map[type])?.classList.add('active');
+    renderList();
+}
+
+function applyFilters() { renderList(); }
+
+function handleClick(id) {
+    const t = TODOS.find(x => x.id === id);
+    if (!t) return;
+    location.href = t.link;
+}
+
+function markDone(id) {
+    const t = TODOS.find(x => x.id === id);
+    if (!t) return;
+    t.done = true;
+    t.level = 'done';
+    if (window.App) App.toast.success(`「${t.title}」已标记为完成`);
+    renderList();
+    updateStats();
+}
+
+function updateStats() {
+    const pending = TODOS.filter(t => !t.done);
+    const urgent  = TODOS.filter(t => !t.done && t.level === 'urgent');
+    const warn    = TODOS.filter(t => !t.done && t.level === 'warning');
+    const done    = TODOS.filter(t => t.done);
+    document.getElementById('statTotal').textContent  = pending.length;
+    document.getElementById('statUrgent').textContent = urgent.length;
+    document.getElementById('statWarn').textContent   = warn.length;
+    document.getElementById('statDone').textContent   = done.length;
+    document.getElementById('cntAll').textContent     = pending.length;
+    document.getElementById('cntUrgent').textContent  = urgent.length;
+    document.getElementById('cntWarn').textContent    = warn.length;
+}
+
+function addTodoModal() {
+    if (window.App) App.toast.info('新增待办功能开发中...');
+}
+
+// 侧边栏
+document.querySelectorAll('.nav-item.has-submenu > .nav-link').forEach(link => {
+    link.addEventListener('click', e => {
+        e.preventDefault();
+        link.parentElement.classList.toggle('active');
+        link.parentElement.querySelector('.submenu')?.classList.toggle('show');
+    });
+});
+document.getElementById('menuToggle').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+    document.querySelector('.main-content').classList.toggle('expanded');
+});
+
+renderList();
+</script>
+</body>
+</html>

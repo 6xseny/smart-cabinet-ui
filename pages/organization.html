@@ -1,0 +1,513 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组织架构 - 智能柜后台管理系统</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 部门表格样式 */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .data-table th,
+        .data-table td {
+            padding: var(--space-4) var(--space-5);
+            text-align: left;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .data-table th {
+            background: rgba(0, 191, 255, 0.05);
+            color: var(--text-secondary);
+            font-weight: var(--font-semibold);
+            font-size: var(--text-sm);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .data-table tbody tr {
+            transition: all var(--duration-fast) var(--ease-out);
+        }
+
+        .data-table tbody tr:hover {
+            background: rgba(0, 191, 255, 0.05);
+        }
+
+        .dept-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .dept-info i {
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient-primary);
+            border-radius: var(--radius-md);
+            color: white;
+            font-size: 14px;
+        }
+
+        .dept-info span {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: var(--space-1) var(--space-3);
+            border-radius: var(--radius-full);
+            font-size: var(--text-xs);
+            font-weight: var(--font-medium);
+        }
+
+        .badge-success {
+            background: rgba(16, 185, 129, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .btn-sm {
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--text-sm);
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1px solid var(--border-primary);
+            color: var(--text-secondary);
+            transition: all var(--duration-fast) var(--ease-out);
+        }
+
+        .btn-ghost:hover {
+            border-color: var(--primary-500);
+            color: var(--primary-400);
+            background: rgba(0, 191, 255, 0.1);
+            box-shadow: 0 0 10px rgba(0, 191, 255, 0.2);
+        }
+
+        .user-dropdown.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+    
+        /* 用户下拉菜单样式 */
+        .user-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 220px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all var(--transition-fast);
+            z-index: 1000;
+        }
+
+        .user-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+        }
+
+        .user-menu-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .user-menu-info {
+            flex: 1;
+        }
+
+        .user-menu-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+        }
+
+        .user-menu-role {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: var(--space-2) 0;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .user-menu-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .user-menu-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .user-menu-item.logout {
+            color: var(--danger-500);
+        }
+
+        .user-menu-item.logout:hover {
+            background: var(--danger-500);
+            color: white;
+        }
+
+        /* 下拉箭头旋转动画 */
+        .user-dropdown .fa-chevron-down {
+            transition: transform var(--transition-fast);
+        }
+
+        .user-dropdown.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+</style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-cube"></i>
+                    <span>智能柜系统</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>工作台</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="device-monitor.html" class="nav-link">
+                            <i class="fas fa-desktop"></i>
+                            <span>设备监控中心</span>
+                        </a>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>基础管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="product.html">商品档案</a></li>
+                            <li><a href="supplier.html">供应商管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-qrcode"></i>
+                            <span>赋码管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="coding-task.html">赋码任务</a></li>
+                            <li><a href="code-contrast.html">标签对照</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu active">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>系统管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu show">
+                            <li><a href="organization.html" class="active">组织架构</a></li>
+                            <li><a href="device.html">设备管理</a></li>
+                            <li><a href="user.html">用户权限</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-warehouse"></i>
+                            <span>库存管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="inventory.html">库存查询</a></li>
+                            <li><a href="warning.html">库存预警</a></li>
+                            <li><a href="replenish.html">补货管理</a></li>
+                            <li><a href="stocktaking.html">盘点管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>查询统计</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="query.html">业务查询</a></li>
+                            <li><a href="report.html">统计报表</a></li>
+                            <li><a href="trace.html">追溯中心</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <span>系统管理</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <span class="current">组织架构</span>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="全局搜索...">
+                    </div>
+                    <div class="header-actions">
+                        <button class="action-btn" onclick="location.href='todo-list.html'" title="待办事项">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown" style="position:relative;">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-avatar">
+                            <span class="user-name">系统管理员</span>
+                            <i class="fas fa-chevron-down"></i>
+                            <!-- 用户下拉菜单 -->
+                            <div class="user-menu" id="userMenu">
+                                <div class="user-menu-header">
+                                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-menu-avatar">
+                                    <div class="user-menu-info">
+                                        <div class="user-menu-name">系统管理员</div>
+                                        <div class="user-menu-role">超级管理员</div>
+                                    </div>
+                                </div>
+                                <div class="user-menu-divider"></div>
+                                <a href="javascript:void(0);" class="user-menu-item" onclick="openPersonalSettingsModal()">
+                                    <i class="fas fa-user-cog"></i>
+                                    <span>个人设置</span>
+                                </a>
+                                <div class="user-menu-divider"></div>
+                                <a href="../login.html" class="user-menu-item logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>退出登录</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">组织架构</h1>
+                        <p class="page-desc">管理医院科室和部门组织架构</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="openAddDepartmentModal()">
+                            <i class="fas fa-plus"></i>
+                            新增部门
+                        </button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list"></i>
+                            部门列表
+                        </h3>
+                    </div>
+                    <div class="card-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>部门名称</th>
+                                    <th>部门类型</th>
+                                    <th>上级部门</th>
+                                    <th>负责人</th>
+                                    <th>状态</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div class="dept-info">
+                                            <i class="fas fa-hospital"></i>
+                                            <span>XX医院</span>
+                                        </div>
+                                    </td>
+                                    <td>医疗机构</td>
+                                    <td>-</td>
+                                    <td>张院长</td>
+                                    <td><span class="badge badge-success">正常</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-ghost"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="dept-info">
+                                            <i class="fas fa-procedures"></i>
+                                            <span>手术室</span>
+                                        </div>
+                                    </td>
+                                    <td>临床科室</td>
+                                    <td>XX医院</td>
+                                    <td>李主任</td>
+                                    <td><span class="badge badge-success">正常</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-ghost"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="dept-info">
+                                            <i class="fas fa-heartbeat"></i>
+                                            <span>急诊科</span>
+                                        </div>
+                                    </td>
+                                    <td>临床科室</td>
+                                    <td>XX医院</td>
+                                    <td>王主任</td>
+                                    <td><span class="badge badge-success">正常</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-ghost"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="dept-info">
+                                            <i class="fas fa-bed"></i>
+                                            <span>住院部</span>
+                                        </div>
+                                    </td>
+                                    <td>临床科室</td>
+                                    <td>XX医院</td>
+                                    <td>刘主任</td>
+                                    <td><span class="badge badge-success">正常</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-ghost"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <div class="dept-info">
+                                            <i class="fas fa-warehouse"></i>
+                                            <span>药库</span>
+                                        </div>
+                                    </td>
+                                    <td>医技科室</td>
+                                    <td>XX医院</td>
+                                    <td>陈主任</td>
+                                    <td><span class="badge badge-success">正常</span></td>
+                                    <td>
+                                        <button class="btn btn-sm btn-ghost"><i class="fas fa-edit"></i></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        document.querySelectorAll('.nav-item.has-submenu > .nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const parent = link.parentElement;
+                parent.classList.toggle('active');
+                const submenu = parent.querySelector('.submenu');
+                submenu.classList.toggle('show');
+            });
+        });
+
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        });
+    
+    // 用户下拉菜单交互
+    const userDropdown = document.getElementById('userDropdown');
+    const userMenu = document.getElementById('userMenu');
+
+    if (userDropdown && userMenu) {
+        userDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+            userMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('active');
+                userMenu.classList.remove('show');
+            }
+        });
+
+        const logoutBtn = document.querySelector('.user-menu-item.logout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (typeof Modal !== 'undefined') {
+                    Modal.confirm('确定要退出登录吗？', () => {
+                        window.location.href = logoutBtn.getAttribute('href');
+                    });
+                } else {
+                    if (confirm('确定要退出登录吗？')) {
+                        window.location.href = logoutBtn.getAttribute('href');
+                    }
+                }
+            });
+        }
+    }
+</script>
+    <script src="../js/app.js"></script>
+    <script src="../js/page-enhance.js"></script>
+</body>
+</html>

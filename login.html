@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>智能柜后台管理系统 - 登录</title>
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/components.css">
+  <style>
+    .login-page {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: var(--space-lg);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 动态背景粒子 */
+    .particles {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .particle {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--primary-500);
+      border-radius: 50%;
+      opacity: 0.3;
+      animation: float 15s infinite;
+    }
+
+    @keyframes float {
+      0%, 100% {
+        transform: translateY(100vh) rotate(0deg);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.3;
+      }
+      90% {
+        opacity: 0.3;
+      }
+      100% {
+        transform: translateY(-100vh) rotate(720deg);
+        opacity: 0;
+      }
+    }
+
+    /* 登录容器 */
+    .login-container {
+      display: flex;
+      width: 100%;
+      max-width: 1000px;
+      min-height: 560px;
+      background: var(--gradient-card);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-xl);
+      overflow: hidden;
+      position: relative;
+      z-index: 1;
+      box-shadow: var(--shadow-lg);
+    }
+
+    /* 左侧品牌区域 */
+    .login-brand {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-3xl);
+      background: linear-gradient(135deg, rgba(24, 144, 255, 0.1) 0%, rgba(54, 207, 201, 0.05) 100%);
+      border-right: 1px solid var(--border-primary);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .login-brand::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      left: -50%;
+      width: 200%;
+      height: 200%;
+      background: 
+        radial-gradient(circle at 30% 30%, rgba(24, 144, 255, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 70% 70%, rgba(54, 207, 201, 0.1) 0%, transparent 40%);
+      animation: rotate 30s linear infinite;
+    }
+
+    @keyframes rotate {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .brand-content {
+      position: relative;
+      z-index: 1;
+    }
+
+    .brand-logo {
+      width: 64px;
+      height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--gradient-primary);
+      border-radius: var(--radius-lg);
+      margin-bottom: var(--space-xl);
+      box-shadow: var(--shadow-glow);
+    }
+
+    .brand-logo svg {
+      width: 36px;
+      height: 36px;
+      color: white;
+    }
+
+    .brand-title {
+      font-family: var(--font-display);
+      font-size: var(--text-3xl);
+      font-weight: var(--font-bold);
+      background: var(--gradient-primary);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: var(--space-md);
+    }
+
+    .brand-subtitle {
+      font-size: var(--text-lg);
+      color: var(--text-secondary);
+      margin-bottom: var(--space-xl);
+    }
+
+    .brand-features {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-md);
+    }
+
+    .brand-feature {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+
+    .brand-feature-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(24, 144, 255, 0.1);
+      border-radius: var(--radius-md);
+    }
+
+    .brand-feature-icon svg {
+      width: 16px;
+      height: 16px;
+      color: var(--primary-400);
+    }
+
+    /* 右侧表单区域 */
+    .login-form-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: var(--space-3xl);
+    }
+
+    .form-header {
+      margin-bottom: var(--space-xl);
+    }
+
+    .form-title {
+      font-size: var(--text-2xl);
+      font-weight: var(--font-bold);
+      color: var(--text-primary);
+      margin-bottom: var(--space-sm);
+    }
+
+    .form-subtitle {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+
+    .login-form {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-lg);
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .form-label {
+      font-size: var(--text-sm);
+      font-weight: var(--font-medium);
+      color: var(--text-secondary);
+    }
+
+    .input-wrapper {
+      position: relative;
+    }
+
+    .input-icon {
+      position: absolute;
+      left: var(--space-md);
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-tertiary);
+      transition: color var(--duration-fast) var(--ease-out);
+    }
+
+    .input-wrapper {
+      width: 100%;
+    }
+
+    .input-wrapper .input {
+      width: 100%;
+      padding-left: 44px;
+      height: 52px;
+      background: rgba(10, 25, 41, 0.8) !important;
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-md);
+      color: var(--text-primary);
+      font-size: var(--text-base);
+      transition: all var(--duration-fast) var(--ease-out);
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+    }
+
+    .input-wrapper .input::placeholder {
+      color: var(--text-tertiary);
+    }
+
+    .input-wrapper .input:hover {
+      border-color: var(--primary-500);
+      background: rgba(10, 25, 41, 0.95) !important;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 10px rgba(0, 191, 255, 0.2);
+    }
+
+    .input-wrapper .input:focus {
+      border-color: var(--primary-400);
+      background: rgba(10, 25, 41, 1) !important;
+      box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 191, 255, 0.4), 0 0 30px rgba(0, 191, 255, 0.2);
+      outline: none;
+    }
+
+    .input-wrapper .input:focus + .input-icon,
+    .input-wrapper .input:not(:placeholder-shown) + .input-icon {
+      color: var(--primary-400);
+    }
+
+    /* 输入框霓虹光晕动画 */
+    @keyframes inputGlow {
+      0%, 100% {
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 5px rgba(0, 191, 255, 0.3);
+      }
+      50% {
+        box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3), 0 0 15px rgba(0, 191, 255, 0.5), 0 0 25px rgba(0, 191, 255, 0.3);
+      }
+    }
+
+    .input-wrapper .input:hover {
+      animation: inputGlow 2s ease-in-out infinite;
+    }
+
+    .password-toggle {
+      position: absolute;
+      right: var(--space-md);
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      color: var(--text-tertiary);
+      cursor: pointer;
+      padding: var(--space-xs);
+      transition: color var(--duration-fast) var(--ease-out);
+    }
+
+    .password-toggle:hover {
+      color: var(--text-secondary);
+    }
+
+    .form-options {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .checkbox-wrapper {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+      cursor: pointer;
+    }
+
+    .checkbox-wrapper input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--primary-500);
+    }
+
+    .checkbox-label {
+      font-size: var(--text-sm);
+      color: var(--text-secondary);
+    }
+
+    .forgot-link {
+      font-size: var(--text-sm);
+      color: var(--primary-400);
+    }
+
+    .forgot-link:hover {
+      color: var(--primary-300);
+    }
+
+    .btn-login {
+      width: 100%;
+      height: 52px;
+      font-size: var(--text-base);
+      font-weight: var(--font-semibold);
+      margin-top: var(--space-md);
+      border-radius: var(--radius-md);
+    }
+
+    .login-divider {
+      display: flex;
+      align-items: center;
+      gap: var(--space-md);
+      margin: var(--space-lg) 0;
+    }
+
+    .login-divider::before,
+    .login-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border-primary);
+    }
+
+    .login-divider span {
+      font-size: var(--text-xs);
+      color: var(--text-tertiary);
+    }
+
+    .login-methods {
+      display: flex;
+      justify-content: center;
+      gap: var(--space-md);
+    }
+
+    .login-method {
+      width: 44px;
+      height: 44px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-tertiary);
+      border: 1px solid var(--border-primary);
+      border-radius: var(--radius-md);
+      cursor: pointer;
+      transition: all var(--duration-fast) var(--ease-out);
+    }
+
+    .login-method:hover {
+      border-color: var(--border-glow);
+      background: var(--bg-elevated);
+    }
+
+    .login-method svg {
+      width: 20px;
+      height: 20px;
+      color: var(--text-secondary);
+    }
+
+    .form-footer {
+      margin-top: var(--space-xl);
+      text-align: center;
+      font-size: var(--text-sm);
+      color: var(--text-tertiary);
+    }
+
+    /* 响应式 */
+    @media (max-width: 768px) {
+      .login-container {
+        flex-direction: column;
+        max-width: 420px;
+      }
+
+      .login-brand {
+        display: none;
+      }
+
+      .login-form-wrapper {
+        padding: var(--space-xl);
+      }
+    }
+
+    /* 动画 */
+    .login-container {
+      animation: slideUp 0.6s var(--ease-out);
+    }
+  </style>
+</head>
+<body class="login-page">
+  <!-- 背景粒子 -->
+  <div class="particles" id="particles"></div>
+
+  <div class="login-container">
+    <!-- 左侧品牌区 -->
+    <div class="login-brand">
+      <div class="brand-content">
+        <div class="brand-logo">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+            <line x1="8" y1="21" x2="16" y2="21"/>
+            <line x1="12" y1="17" x2="12" y2="21"/>
+            <path d="M6 8h.01M6 12h.01M10 8h8M10 12h8"/>
+          </svg>
+        </div>
+        <h1 class="brand-title">智能柜管理系统</h1>
+        <p class="brand-subtitle">SPD精益化物资管理平台</p>
+        <div class="brand-features">
+          <div class="brand-feature">
+            <div class="brand-feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+              </svg>
+            </div>
+            <span>全程追溯，安全可控</span>
+          </div>
+          <div class="brand-feature">
+            <div class="brand-feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10"/>
+                <polyline points="12 6 12 12 16 14"/>
+              </svg>
+            </div>
+            <span>实时库存，智能预警</span>
+          </div>
+          <div class="brand-feature">
+            <div class="brand-feature-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/>
+              </svg>
+            </div>
+            <span>多院区管理，灵活配置</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右侧表单区 -->
+    <div class="login-form-wrapper">
+      <div class="form-header">
+        <h2 class="form-title">欢迎回来</h2>
+        <p class="form-subtitle">请登录您的账户以继续</p>
+      </div>
+
+      <form class="login-form" id="loginForm">
+        <div class="form-group">
+          <label class="form-label">用户名 / 工号</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+              <circle cx="12" cy="7" r="4"/>
+            </svg>
+            <input type="text" class="input" placeholder="请输入用户名或工号" required>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">密码</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <rect x="3" y="11" width="18" height="11" rx="2" ry="2"/>
+              <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+            </svg>
+            <input type="password" class="input" id="password" placeholder="请输入密码" required>
+            <button type="button" class="password-toggle" id="togglePassword">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="form-options">
+          <label class="checkbox-wrapper">
+            <input type="checkbox">
+            <span class="checkbox-label">记住我</span>
+          </label>
+          <a href="#" class="forgot-link">忘记密码？</a>
+        </div>
+
+        <button type="submit" class="btn btn-primary btn-login">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+            <polyline points="10 17 15 12 10 7"/>
+            <line x1="15" y1="12" x2="3" y2="12"/>
+          </svg>
+          登录
+        </button>
+      </form>
+
+      <div class="form-footer">
+        <p>© 2024 智能柜管理系统 v2.0.0</p>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/app.js"></script>
+  <script>
+    // 生成背景粒子
+    const particlesContainer = document.getElementById('particles');
+    for (let i = 0; i < 30; i++) {
+      const particle = document.createElement('div');
+      particle.className = 'particle';
+      particle.style.left = Math.random() * 100 + '%';
+      particle.style.animationDelay = Math.random() * 15 + 's';
+      particle.style.animationDuration = (10 + Math.random() * 10) + 's';
+      particlesContainer.appendChild(particle);
+    }
+
+    // 密码显示切换
+    const togglePassword = document.getElementById('togglePassword');
+    const password = document.getElementById('password');
+    
+    togglePassword.addEventListener('click', () => {
+      const type = password.getAttribute('type') === 'password' ? 'text' : 'password';
+      password.setAttribute('type', type);
+      // 切换图标
+      const isVisible = type === 'text';
+      togglePassword.innerHTML = isVisible ? 
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>' :
+        '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+    });
+
+    // 表单提交
+    document.getElementById('loginForm').addEventListener('submit', (e) => {
+      e.preventDefault();
+      const username = document.querySelector('input[type="text"]').value;
+      const password = document.getElementById('password').value;
+      
+      if (!username || !password) {
+        App.toast.error('请输入用户名和密码');
+        return;
+      }
+      
+      App.loading.show('登录中...');
+      
+      // 模拟登录
+      setTimeout(() => {
+        App.loading.hide();
+        App.toast.success('登录成功');
+        window.location.href = 'index.html';
+      }, 1500);
+    });
+    
+    // 忘记密码
+    document.querySelector('.forgot-link')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      App.modal.open({
+        title: '找回密码',
+        width: '400px',
+        content: `
+          <div style="text-align:center;padding:20px;">
+            <i class="fas fa-envelope" style="font-size:48px;color:#00bfff;margin-bottom:16px;"></i>
+            <p style="color:#e4e9f2;margin-bottom:20px;">请输入您的邮箱地址，我们将发送密码重置链接</p>
+            <input type="email" class="form-input" placeholder="请输入邮箱" style="width:100%;">
+          </div>
+        `,
+        onConfirm: () => {
+          App.toast.success('密码重置邮件已发送');
+        }
+      });
+    });
+  </script>
+</body>
+</html>

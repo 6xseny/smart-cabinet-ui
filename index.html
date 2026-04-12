@@ -1,0 +1,1113 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能柜后台管理系统 - 工作台</title>
+    <link rel="stylesheet" href="css/variables.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* 工作台特有样式 */
+        .dashboard-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-5);
+            margin-bottom: var(--space-6);
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: var(--space-6);
+        }
+
+        .quick-actions {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: var(--space-4);
+            margin-bottom: var(--space-6);
+        }
+
+        .quick-action {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-5);
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .quick-action:hover {
+            border-color: var(--primary-500);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-glow);
+        }
+
+        .quick-action-icon {
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--gradient-glow);
+            border-radius: var(--radius-md);
+            font-size: 1.25rem;
+            color: var(--primary-400);
+        }
+
+        .quick-action-text {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        /* 图表容器 */
+        .chart-container {
+            height: 280px;
+            position: relative;
+            padding: var(--space-4) var(--space-4) var(--space-8) var(--space-8);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+        }
+
+        .chart-svg {
+            width: 100%;
+            height: 100%;
+        }
+
+        .chart-line {
+            fill: none;
+            stroke: url(#lineGradient);
+            stroke-width: 3;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            filter: drop-shadow(0 0 8px rgba(0, 191, 255, 0.5));
+        }
+
+        .chart-area {
+            fill: url(#areaGradient);
+            opacity: 0.3;
+        }
+
+        .chart-point {
+            fill: var(--primary-400);
+            stroke: var(--bg-card);
+            stroke-width: 2;
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .chart-point:hover {
+            r: 6;
+            fill: var(--primary-300);
+        }
+
+        .chart-axis {
+            stroke: rgba(136, 146, 160, 0.3);
+            stroke-width: 1;
+        }
+
+        .chart-axis-text {
+            fill: var(--text-tertiary);
+            font-size: 11px;
+            text-anchor: middle;
+        }
+
+        .chart-grid {
+            stroke: rgba(136, 146, 160, 0.1);
+            stroke-width: 1;
+            stroke-dasharray: 4, 4;
+        }
+
+        .chart-tooltip {
+            position: absolute;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: var(--space-2) var(--space-3);
+            font-size: var(--text-xs);
+            color: var(--text-primary);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .chart-tooltip.visible {
+            opacity: 1;
+        }
+
+        /* 待办事项 */
+        .todo-list {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .todo-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            padding: var(--space-4);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--primary-500);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+
+        .todo-item:hover {
+            background: rgba(14, 165, 233, 0.1);
+        }
+
+        .todo-item.warning {
+            border-left-color: var(--warning);
+        }
+
+        .todo-item.error {
+            border-left-color: var(--error);
+        }
+
+        .todo-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            color: var(--primary-400);
+        }
+
+        .todo-item.warning .todo-icon {
+            color: var(--warning);
+        }
+
+        .todo-item.error .todo-icon {
+            color: var(--error);
+        }
+
+        .todo-content {
+            flex: 1;
+        }
+
+        .todo-title {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .todo-desc {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .todo-time {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        /* 设备状态 */
+        .device-status {
+            display: flex;
+            flex-direction: column;
+            gap: var(--space-3);
+        }
+
+        .device-status-row {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: var(--space-4);
+        }
+
+        .device-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-4);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+        }
+
+        .device-info {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+        }
+
+        .device-icon {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-card);
+            border-radius: var(--radius-md);
+            color: var(--primary-400);
+        }
+
+        .device-name {
+            font-size: var(--text-sm);
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+        }
+
+        .device-location {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        .device-state {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            font-size: var(--text-xs);
+            font-weight: var(--font-medium);
+        }
+
+        .state-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+        }
+
+        .state-online {
+            background: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        .state-offline {
+            background: var(--error);
+        }
+
+        .state-warning {
+            background: var(--warning);
+        }
+
+        /* 响应式 */
+        @media (max-width: 1400px) {
+            .dashboard-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+            .quick-actions {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard-stats {
+                grid-template-columns: 1fr;
+            }
+            .quick-actions {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* 用户下拉菜单样式 */
+        .user-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 220px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all var(--transition-fast);
+            z-index: 1000;
+        }
+
+        .user-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+        }
+
+        .user-menu-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .user-menu-info {
+            flex: 1;
+        }
+
+        .user-menu-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+        }
+
+        .user-menu-role {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: var(--space-2) 0;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .user-menu-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .user-menu-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .user-menu-item.logout {
+            color: var(--danger-500);
+        }
+
+        .user-menu-item.logout:hover {
+            background: var(--danger-500);
+            color: white;
+        }
+
+        /* 下拉箭头旋转动画 */
+        .user-dropdown .fa-chevron-down {
+            transition: transform var(--transition-fast);
+        }
+
+        .user-dropdown.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-cube"></i>
+                    <span>智能柜系统</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item active">
+                        <a href="index.html" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>工作台</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="pages/device-monitor.html" class="nav-link">
+                            <i class="fas fa-desktop"></i>
+                            <span>设备监控中心</span>
+                        </a>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>基础管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="pages/product.html">商品档案</a></li>
+                            <li><a href="pages/supplier.html">供应商管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-qrcode"></i>
+                            <span>赋码管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="pages/coding-task.html">赋码任务</a></li>
+                            <li><a href="pages/code-contrast.html">标签对照</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>系统管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="pages/organization.html">组织架构</a></li>
+                            <li><a href="pages/device.html">设备管理</a></li>
+                            <li><a href="pages/user.html">用户权限</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-warehouse"></i>
+                            <span>库存管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="pages/inventory.html">库存查询</a></li>
+                            <li><a href="pages/warning.html">库存预警</a></li>
+                            <li><a href="pages/replenish.html">补货管理</a></li>
+                            <li><a href="pages/stocktaking.html">盘点管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>查询统计</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="pages/query.html">业务查询</a></li>
+                            <li><a href="pages/report.html">统计报表</a></li>
+                            <li><a href="pages/trace.html">追溯中心</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航 -->
+            <header class="top-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <span>首页</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <span class="current">工作台</span>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="全局搜索...">
+                    </div>
+                    <div class="header-actions">
+                        <button class="action-btn" onclick="location.href='pages/todo-list.html'" title="待办事项">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge"></span>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown" style="position:relative;">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-avatar">
+                            <span class="user-name">系统管理员</span>
+                            <i class="fas fa-chevron-down"></i>
+                            <!-- 用户下拉菜单 -->
+                            <div class="user-menu" id="userMenu">
+                                <div class="user-menu-header">
+                                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-menu-avatar">
+                                    <div class="user-menu-info">
+                                        <div class="user-menu-name">系统管理员</div>
+                                        <div class="user-menu-role">超级管理员</div>
+                                    </div>
+                                </div>
+                                <div class="user-menu-divider"></div>
+                                <a href="javascript:void(0);" class="user-menu-item" onclick="openPersonalSettingsModal()">
+                                    <i class="fas fa-user-cog"></i>
+                                    <span>个人设置</span>
+                                </a>
+                                <div class="user-menu-divider"></div>
+                                <a href="login.html" class="user-menu-item logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>退出登录</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <!-- 统计卡片 -->
+                <div class="dashboard-stats">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-boxes"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">12,580</div>
+                            <div class="stat-label">总库存量</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">48</div>
+                            <div class="stat-label">智能柜数量</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon purple">
+                            <i class="fas fa-shopping-cart"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">3,247</div>
+                            <div class="stat-label">本月出库</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">23</div>
+                            <div class="stat-label">库存预警</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 快捷入口 -->
+                <div class="quick-actions">
+                    <div class="quick-action" id="qa-product" onclick="location.href='pages/product.html'">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-plus"></i>
+                        </div>
+                        <span class="quick-action-text">新增商品</span>
+                    </div>
+                    <div class="quick-action" id="qa-coding" onclick="location.href='pages/coding-task.html'">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-terminal"></i>
+                        </div>
+                        <span class="quick-action-text">赋码加工</span>
+                    </div>
+                    <div class="quick-action" id="qa-inventory" onclick="location.href='pages/inventory.html'">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-file-alt"></i>
+                        </div>
+                        <span class="quick-action-text">库存查询</span>
+                    </div>
+                    <div class="quick-action" id="qa-replenish">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-chart-pie"></i>
+                        </div>
+                        <span class="quick-action-text">补货计划</span>
+                    </div>
+                    <div class="quick-action" id="qa-stocktaking">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-clock"></i>
+                        </div>
+                        <span class="quick-action-text">盘点任务</span>
+                    </div>
+                    <div class="quick-action" id="qa-report">
+                        <div class="quick-action-icon">
+                            <i class="fas fa-file-export"></i>
+                        </div>
+                        <span class="quick-action-text">报表导出</span>
+                    </div>
+                </div>
+
+                <!-- 设备状态 - 整行展示 -->
+                <div class="card" style="margin-bottom: var(--space-6);">
+                    <div class="card-header">
+                        <div>
+                            <h3 class="card-title">
+                                <i class="fas fa-server"></i>
+                                设备状态
+                            </h3>
+                        </div>
+                        <span class="badge badge-green" onclick="location.href='pages/device-monitor.html'" style="cursor:pointer;" title="查看全部设备">45/48 在线</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="device-status-row">
+                            <div class="device-item">
+                                <div class="device-info">
+                                    <div class="device-icon">
+                                        <i class="fas fa-server"></i>
+                                    </div>
+                                    <div>
+                                        <div class="device-name">手术室-主柜-A01</div>
+                                        <div class="device-location">1号住院楼 3层 手术室</div>
+                                    </div>
+                                </div>
+                                <div class="device-state">
+                                    <span class="state-dot state-online"></span>
+                                    <span>在线</span>
+                                </div>
+                            </div>
+                            <div class="device-item">
+                                <div class="device-info">
+                                    <div class="device-icon">
+                                        <i class="fas fa-server"></i>
+                                    </div>
+                                    <div>
+                                        <div class="device-name">急诊室-副柜-B03</div>
+                                        <div class="device-location">急诊科 1层</div>
+                                    </div>
+                                </div>
+                                <div class="device-state">
+                                    <span class="state-dot state-online"></span>
+                                    <span>在线</span>
+                                </div>
+                            </div>
+                            <div class="device-item">
+                                <div class="device-info">
+                                    <div class="device-icon">
+                                        <i class="fas fa-server"></i>
+                                    </div>
+                                    <div>
+                                        <div class="device-name">ICU-主柜-C02</div>
+                                        <div class="device-location">2号住院楼 5层 ICU</div>
+                                    </div>
+                                </div>
+                                <div class="device-state">
+                                    <span class="state-dot state-warning"></span>
+                                    <span>预警</span>
+                                </div>
+                            </div>
+                            <div class="device-item">
+                                <div class="device-info">
+                                    <div class="device-icon">
+                                        <i class="fas fa-server"></i>
+                                    </div>
+                                    <div>
+                                        <div class="device-name">骨科-副柜-D05</div>
+                                        <div class="device-location">2号住院楼 3层 骨科</div>
+                                    </div>
+                                </div>
+                                <div class="device-state">
+                                    <span class="state-dot state-offline"></span>
+                                    <span>离线</span>
+                                </div>
+                            </div>
+                            <div class="device-item">
+                                <div class="device-info">
+                                    <div class="device-icon">
+                                        <i class="fas fa-server"></i>
+                                    </div>
+                                    <div>
+                                        <div class="device-name">心内科-主柜-E01</div>
+                                        <div class="device-location">1号住院楼 4层 心内科</div>
+                                    </div>
+                                </div>
+                                <div class="device-state">
+                                    <span class="state-dot state-online"></span>
+                                    <span>在线</span>
+                                </div>
+                            </div>
+                            <div class="device-item">
+                                <div class="device-info">
+                                    <div class="device-icon">
+                                        <i class="fas fa-server"></i>
+                                    </div>
+                                    <div>
+                                        <div class="device-name">儿科-副柜-F02</div>
+                                        <div class="device-location">门诊楼 2层 儿科</div>
+                                    </div>
+                                </div>
+                                <div class="device-state">
+                                    <span class="state-dot state-online"></span>
+                                    <span>在线</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 库存趋势 + 待办事项 -->
+                <div class="dashboard-grid" style="grid-template-columns: 2fr 1fr;">
+                    <!-- 左侧：库存趋势 -->
+                    <div class="dashboard-left">
+                        <div class="card" style="height: 100%;">
+                            <div class="card-header">
+                                <div>
+                                    <h3 class="card-title">
+                                        <i class="fas fa-chart-line"></i>
+                                        库存趋势
+                                    </h3>
+                                </div>
+                                <div class="card-actions">
+                                    <button class="btn btn-text" id="btnWeek" style="padding: 6px 16px; min-width: 60px; height: 32px;">本周</button>
+                                    <button class="btn btn-primary" id="btnMonth" style="padding: 6px 16px; min-width: 60px; height: 32px;">本月</button>
+                                </div>
+                            </div>
+                            <div class="card-body" style="flex: 1; display: flex; flex-direction: column;">
+                                <div class="chart-container" id="trendChart">
+                                    <svg class="chart-svg" viewBox="0 0 800 250" preserveAspectRatio="none">
+                                        <defs>
+                                            <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+                                                <stop offset="0%" style="stop-color:#00bfff;stop-opacity:1" />
+                                                <stop offset="100%" style="stop-color:#00d4ff;stop-opacity:1" />
+                                            </linearGradient>
+                                            <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+                                                <stop offset="0%" style="stop-color:#00bfff;stop-opacity:0.4" />
+                                                <stop offset="100%" style="stop-color:#00bfff;stop-opacity:0.05" />
+                                            </linearGradient>
+                                        </defs>
+                                        <!-- 网格线 -->
+                                        <line class="chart-grid" x1="50" y1="200" x2="780" y2="200"/>
+                                        <line class="chart-grid" x1="50" y1="150" x2="780" y2="150"/>
+                                        <line class="chart-grid" x1="50" y1="100" x2="780" y2="100"/>
+                                        <line class="chart-grid" x1="50" y1="50" x2="780" y2="50"/>
+                                        <!-- Y轴 -->
+                                        <line class="chart-axis" x1="50" y1="20" x2="50" y2="200"/>
+                                        <!-- X轴 -->
+                                        <line class="chart-axis" x1="50" y1="200" x2="780" y2="200"/>
+                                        <!-- 面积 -->
+                                        <path class="chart-area" d="M50,180 Q150,160 250,140 T450,100 T650,60 T780,40 L780,200 L50,200 Z"/>
+                                        <!-- 曲线 -->
+                                        <path class="chart-line" d="M50,180 Q150,160 250,140 T450,100 T650,60 T780,40"/>
+                                        <!-- 数据点 -->
+                                        <circle class="chart-point" cx="50" cy="180" r="4" data-value="4,521" data-date="04-01"/>
+                                        <circle class="chart-point" cx="170" cy="150" r="4" data-value="5,234" data-date="04-03"/>
+                                        <circle class="chart-point" cx="290" cy="120" r="4" data-value="6,021" data-date="04-05"/>
+                                        <circle class="chart-point" cx="410" cy="100" r="4" data-value="6,832" data-date="04-07"/>
+                                        <circle class="chart-point" cx="530" cy="70" r="4" data-value="7,521" data-date="04-09"/>
+                                        <circle class="chart-point" cx="650" cy="60" r="4" data-value="8,234" data-date="04-11"/>
+                                        <circle class="chart-point" cx="780" cy="40" r="4" data-value="9,021" data-date="04-13"/>
+                                        <!-- Y轴标签 -->
+                                        <text class="chart-axis-text" x="35" y="205">0</text>
+                                        <text class="chart-axis-text" x="35" y="155">3K</text>
+                                        <text class="chart-axis-text" x="35" y="105">6K</text>
+                                        <text class="chart-axis-text" x="35" y="55">9K</text>
+                                        <!-- X轴标签 -->
+                                        <text class="chart-axis-text" x="50" y="220">04-01</text>
+                                        <text class="chart-axis-text" x="170" y="220">04-03</text>
+                                        <text class="chart-axis-text" x="290" y="220">04-05</text>
+                                        <text class="chart-axis-text" x="410" y="220">04-07</text>
+                                        <text class="chart-axis-text" x="530" y="220">04-09</text>
+                                        <text class="chart-axis-text" x="650" y="220">04-11</text>
+                                        <text class="chart-axis-text" x="780" y="220">04-13</text>
+                                    </svg>
+                                    <div class="chart-tooltip" id="chartTooltip"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 右侧：待办事项 -->
+                    <div class="dashboard-right">
+                        <div class="card" style="height: 100%;">
+                            <div class="card-header">
+                                <div>
+                                    <h3 class="card-title">
+                                        <i class="fas fa-list-check"></i>
+                                        待办事项
+                                    </h3>
+                                </div>
+                                <button class="btn btn-text" onclick="location.href='pages/todo-list.html'">查看全部</button>
+                            </div>
+                            <div class="card-body" style="flex: 1; display: flex; flex-direction: column;">
+                                <div class="todo-list" style="flex: 1; display: flex; flex-direction: column; gap: var(--space-3);">
+                                    <div class="todo-item error">
+                                        <div class="todo-icon">
+                                            <i class="fas fa-exclamation-triangle"></i>
+                                        </div>
+                                        <div class="todo-content">
+                                            <div class="todo-title">库存预警处理</div>
+                                            <div class="todo-desc">23个商品库存低于安全线</div>
+                                        </div>
+                                        <div class="todo-time">2小时前</div>
+                                    </div>
+                                    <div class="todo-item warning">
+                                        <div class="todo-icon">
+                                            <i class="fas fa-clock"></i>
+                                        </div>
+                                        <div class="todo-content">
+                                            <div class="todo-title">盘点任务待执行</div>
+                                            <div class="todo-desc">手术室月度盘点任务</div>
+                                        </div>
+                                        <div class="todo-time">今天</div>
+                                    </div>
+                                    <div class="todo-item">
+                                        <div class="todo-icon">
+                                            <i class="fas fa-calendar"></i>
+                                        </div>
+                                        <div class="todo-content">
+                                            <div class="todo-title">赋码加工单审核</div>
+                                            <div class="todo-desc">3张加工单待审核</div>
+                                        </div>
+                                        <div class="todo-time">昨天</div>
+                                    </div>
+                                    <div class="todo-item">
+                                        <div class="todo-icon">
+                                            <i class="fas fa-comment"></i>
+                                        </div>
+                                        <div class="todo-content">
+                                            <div class="todo-title">设备离线告警</div>
+                                            <div class="todo-desc">骨科智能柜网络异常</div>
+                                        </div>
+                                        <div class="todo-time">2天前</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script src="js/page-handler.js"></script>
+    <script>
+        // 菜单切换
+        document.querySelectorAll('.nav-item.has-submenu > .nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const parent = link.parentElement;
+                parent.classList.toggle('active');
+                const submenu = parent.querySelector('.submenu');
+                submenu.classList.toggle('show');
+            });
+        });
+
+        // 侧边栏折叠
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        });
+
+        // 用户下拉菜单交互
+        const userDropdown = document.getElementById('userDropdown');
+        const userMenu = document.getElementById('userMenu');
+
+        if (userDropdown && userMenu) {
+            userDropdown.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userDropdown.classList.toggle('active');
+                userMenu.classList.toggle('show');
+            });
+
+            // 点击外部关闭下拉菜单
+            document.addEventListener('click', (e) => {
+                if (!userDropdown.contains(e.target)) {
+                    userDropdown.classList.remove('active');
+                    userMenu.classList.remove('show');
+                }
+            });
+
+            // 退出登录确认
+            const logoutBtn = document.querySelector('.user-menu-item.logout');
+            if (logoutBtn) {
+                logoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    if (typeof Modal !== 'undefined') {
+                        Modal.confirm('确定要退出登录吗？', () => {
+                            window.location.href = logoutBtn.getAttribute('href');
+                        });
+                    } else {
+                        if (confirm('确定要退出登录吗？')) {
+                            window.location.href = logoutBtn.getAttribute('href');
+                        }
+                    }
+                });
+            }
+        }
+
+        // 工作台页面交互增强
+        document.addEventListener('DOMContentLoaded', () => {
+            // 统计卡片点击
+            document.querySelectorAll('.stat-card').forEach(card => {
+                card.style.cursor = 'pointer';
+                card.addEventListener('click', () => {
+                    const label = card.querySelector('.stat-label')?.textContent;
+                    if (label === '库存预警') {
+                        window.location.href = 'pages/warning.html';
+                    } else if (label === '智能柜数量') {
+                        window.location.href = 'pages/device.html';
+                    }
+                });
+            });
+            
+            // 待办事项点击
+            document.querySelectorAll('.todo-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    const title = item.querySelector('.todo-title')?.textContent;
+                    if (title?.includes('库存预警')) {
+                        window.location.href = 'pages/warning.html';
+                    } else if (title?.includes('盘点')) {
+                        window.location.href = 'pages/stocktaking.html';
+                    }
+                });
+            });
+            
+            // 快捷操作
+            document.querySelectorAll('.quick-action').forEach(action => {
+                action.addEventListener('click', function() {
+                    const text = this.querySelector('.quick-action-text')?.textContent;
+                    if (!this.getAttribute('onclick')) {
+                        App.toast.info(`${text}功能开发中...`);
+                    }
+                });
+            });
+
+            // 补货计划 - 跳转补货管理页
+            document.getElementById('qa-replenish')?.addEventListener('click', () => {
+                location.href = 'pages/replenish.html';
+            });
+
+            // 盘点任务 - 跳转盘点管理页
+            document.getElementById('qa-stocktaking')?.addEventListener('click', () => {
+                location.href = 'pages/stocktaking.html';
+            });
+
+            // 报表导出 - 弹出导出面板
+            document.getElementById('qa-report')?.addEventListener('click', () => {
+                const overlay = document.createElement('div');
+                overlay.id = 'exportPanel';
+                overlay.style.cssText = `
+                    position:fixed;inset:0;z-index:9000;
+                    display:flex;align-items:center;justify-content:center;
+                    background:rgba(0,0,0,0.6);backdrop-filter:blur(4px);
+                `;
+                overlay.innerHTML = `
+                    <div style="
+                        background:linear-gradient(135deg,#0d1b2e,#0a2540);
+                        border:1px solid rgba(0,191,255,0.25);
+                        border-radius:16px;width:520px;max-width:92vw;
+                        box-shadow:0 0 40px rgba(0,191,255,0.15);
+                        animation:fadeInUp .25s ease;
+                    ">
+                        <div style="display:flex;align-items:center;justify-content:space-between;padding:20px 24px 16px;border-bottom:1px solid rgba(255,255,255,0.06);">
+                            <div style="display:flex;align-items:center;gap:10px;font-size:15px;font-weight:600;color:#e4e9f2;">
+                                <i class="fas fa-file-export" style="color:#00bfff;"></i> 报表导出
+                            </div>
+                            <button onclick="document.getElementById('exportPanel').remove()" style="background:none;border:none;color:#8892a0;font-size:18px;cursor:pointer;line-height:1;">&times;</button>
+                        </div>
+                        <div style="padding:24px;">
+                            <div style="margin-bottom:20px;">
+                                <div style="font-size:12px;color:#8892a0;margin-bottom:10px;text-transform:uppercase;letter-spacing:.05em;">报表类型</div>
+                                <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
+                                    ${[
+                                        ['fa-boxes','库存汇总报表'],
+                                        ['fa-chart-line','库存趋势报表'],
+                                        ['fa-truck','出入库明细报表'],
+                                        ['fa-exclamation-triangle','预警分析报表'],
+                                        ['fa-clipboard-list','盘点差异报表'],
+                                        ['fa-hospital','科室消耗报表']
+                                    ].map(([icon,label]) => `
+                                        <label style="display:flex;align-items:center;gap:10px;padding:12px 14px;background:rgba(255,255,255,0.04);border:1px solid rgba(255,255,255,0.07);border-radius:8px;cursor:pointer;transition:all .2s;"
+                                            onmouseover="this.style.borderColor='rgba(0,191,255,0.4)';this.style.background='rgba(0,191,255,0.06)'"
+                                            onmouseout="this.style.borderColor='rgba(255,255,255,0.07)';this.style.background='rgba(255,255,255,0.04)'">
+                                            <input type="checkbox" style="accent-color:#00bfff;width:15px;height:15px;">
+                                            <i class="fas ${icon}" style="color:#00bfff;width:16px;text-align:center;"></i>
+                                            <span style="font-size:13px;color:#e4e9f2;">${label}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;">
+                                <div>
+                                    <div style="font-size:12px;color:#8892a0;margin-bottom:6px;">开始日期</div>
+                                    <input type="date" value="2026-04-01" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#e4e9f2;font-size:13px;outline:none;">
+                                </div>
+                                <div>
+                                    <div style="font-size:12px;color:#8892a0;margin-bottom:6px;">结束日期</div>
+                                    <input type="date" value="2026-04-10" style="width:100%;background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);border-radius:8px;padding:9px 12px;color:#e4e9f2;font-size:13px;outline:none;">
+                                </div>
+                            </div>
+                            <div style="margin-bottom:20px;">
+                                <div style="font-size:12px;color:#8892a0;margin-bottom:8px;">导出格式</div>
+                                <div style="display:flex;gap:8px;">
+                                    ${[['fa-file-excel','Excel (.xlsx)','#1d6f42'],['fa-file-pdf','PDF','#c0392b'],['fa-file-csv','CSV','#2980b9']].map(([icon,label,color],i) => `
+                                        <label style="flex:1;display:flex;align-items:center;gap:8px;padding:9px 12px;background:rgba(255,255,255,0.04);border:1px solid ${i===0?'rgba(0,191,255,0.5)':'rgba(255,255,255,0.07)'};border-radius:8px;cursor:pointer;transition:border .2s;" id="fmt-${i}">
+                                            <input type="radio" name="exportFmt" ${i===0?'checked':''} style="accent-color:#00bfff;">
+                                            <i class="fas ${icon}" style="color:${color};"></i>
+                                            <span style="font-size:12px;color:#e4e9f2;">${label}</span>
+                                        </label>
+                                    `).join('')}
+                                </div>
+                            </div>
+                            <div style="display:flex;gap:10px;justify-content:flex-end;">
+                                <button onclick="document.getElementById('exportPanel').remove()" style="padding:9px 20px;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.12);border-radius:8px;color:#8892a0;font-size:13px;cursor:pointer;">取消</button>
+                                <button id="doExport" style="padding:9px 24px;background:linear-gradient(135deg,#0099cc,#00bfff);border:none;border-radius:8px;color:#fff;font-size:13px;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:6px;">
+                                    <i class="fas fa-download"></i> 立即导出
+                                </button>
+                            </div>
+                        </div>
+                    </div>`;
+                document.body.appendChild(overlay);
+                overlay.addEventListener('click', e => { if(e.target === overlay) overlay.remove(); });
+                document.getElementById('doExport')?.addEventListener('click', () => {
+                    overlay.remove();
+                    App.toast.success('报表导出成功，请查收文件');
+                });
+            });
+            
+            // 库存趋势图表交互
+            const chartPoints = document.querySelectorAll('.chart-point');
+            const tooltip = document.getElementById('chartTooltip');
+            const chartContainer = document.getElementById('trendChart');
+            
+            chartPoints.forEach(point => {
+                point.addEventListener('mouseenter', (e) => {
+                    const value = e.target.getAttribute('data-value');
+                    const date = e.target.getAttribute('data-date');
+                    tooltip.innerHTML = `<div style="font-weight:600;color:#00bfff;">${date}</div><div>库存: ${value}</div>`;
+                    tooltip.classList.add('visible');
+                    
+                    const rect = e.target.getBoundingClientRect();
+                    const containerRect = chartContainer.getBoundingClientRect();
+                    tooltip.style.left = (rect.left - containerRect.left + 10) + 'px';
+                    tooltip.style.top = (rect.top - containerRect.top - 50) + 'px';
+                });
+                
+                point.addEventListener('mouseleave', () => {
+                    tooltip.classList.remove('visible');
+                });
+            });
+            
+            // 本周/本月切换
+            const btnWeek = document.getElementById('btnWeek');
+            const btnMonth = document.getElementById('btnMonth');
+            
+            btnWeek?.addEventListener('click', () => {
+                btnWeek.classList.remove('btn-text');
+                btnWeek.classList.add('btn-primary');
+                btnMonth.classList.remove('btn-primary');
+                btnMonth.classList.add('btn-text');
+                App.toast.info('已切换至本周视图');
+            });
+            
+            btnMonth?.addEventListener('click', () => {
+                btnMonth.classList.remove('btn-text');
+                btnMonth.classList.add('btn-primary');
+                btnWeek.classList.remove('btn-primary');
+                btnWeek.classList.add('btn-text');
+                App.toast.info('已切换至本月视图');
+            });
+        });
+    </script>
+</body>
+</html>

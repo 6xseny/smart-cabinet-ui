@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>智能柜后台管理系统 - 设备监控</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ---- 页面特有样式 ---- */
+        .monitor-summary {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-5);
+            margin-bottom: var(--space-6);
+        }
+
+        .summary-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-5);
+            display: flex;
+            align-items: center;
+            gap: var(--space-4);
+            position: relative;
+            overflow: hidden;
+            transition: all var(--transition-fast);
+        }
+        .summary-card::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity var(--transition-fast);
+        }
+        .summary-card:hover { transform: translateY(-2px); box-shadow: var(--shadow-glow); }
+
+        .summary-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            flex-shrink: 0;
+        }
+        .summary-icon.total   { background: rgba(0,191,255,0.15); color: var(--primary-400); }
+        .summary-icon.online  { background: rgba(0,255,136,0.15); color: var(--success); }
+        .summary-icon.warning { background: rgba(255,204,0,0.15);  color: var(--warning); }
+        .summary-icon.offline { background: rgba(255,51,102,0.15); color: var(--error); }
+
+        .summary-info { flex: 1; }
+        .summary-value { font-size: 1.75rem; font-weight: var(--font-bold); color: var(--text-primary); line-height: 1; margin-bottom: 4px; }
+        .summary-label { font-size: var(--text-sm); color: var(--text-tertiary); }
+        .summary-rate  { font-size: var(--text-xs); margin-top: 4px; }
+        .summary-rate.up   { color: var(--success); }
+        .summary-rate.warn { color: var(--warning); }
+        .summary-rate.err  { color: var(--error); }
+
+        /* 工具栏 */
+        .toolbar {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            margin-bottom: var(--space-5);
+            flex-wrap: wrap;
+        }
+        .toolbar-left  { display: flex; align-items: center; gap: var(--space-3); flex: 1; flex-wrap: wrap; }
+        .toolbar-right { display: flex; align-items: center; gap: var(--space-3); }
+
+        .filter-btn {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: 8px 16px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .filter-btn:hover, .filter-btn.active { border-color: var(--primary-500); color: var(--primary-400); background: rgba(0,191,255,0.08); }
+        .filter-btn .count { background: var(--primary-500); color: #fff; border-radius: var(--radius-full); padding: 1px 7px; font-size: var(--text-xs); font-weight: 600; }
+        .filter-btn.warning-btn.active { border-color: var(--warning); color: var(--warning); background: rgba(255,204,0,0.08); }
+        .filter-btn.warning-btn .count { background: var(--warning); color: #000; }
+        .filter-btn.offline-btn.active { border-color: var(--error); color: var(--error); background: rgba(255,51,102,0.08); }
+        .filter-btn.offline-btn .count { background: var(--error); }
+
+        .search-input {
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            min-width: 200px;
+        }
+        .search-input input {
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            width: 100%;
+        }
+        .search-input input::placeholder { color: var(--text-tertiary); }
+        .search-input:focus-within { border-color: var(--primary-500); }
+
+        /* 设备网格 */
+        .device-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: var(--space-4);
+        }
+
+        .device-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: var(--space-4);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+            position: relative;
+            overflow: hidden;
+        }
+        .device-card::after {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; right: 0;
+            height: 3px;
+            border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+        }
+        .device-card.online::after  { background: linear-gradient(90deg, var(--success), rgba(0,255,136,0.3)); }
+        .device-card.warning::after { background: linear-gradient(90deg, var(--warning), rgba(255,204,0,0.3)); }
+        .device-card.offline::after { background: linear-gradient(90deg, var(--error), rgba(255,51,102,0.3)); }
+        .device-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-glow); border-color: var(--primary-400); }
+        .device-card.warning:hover { box-shadow: 0 0 16px rgba(255,204,0,0.3); border-color: var(--warning); }
+        .device-card.offline:hover { box-shadow: 0 0 16px rgba(255,51,102,0.3); border-color: var(--error); }
+
+        .dc-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: var(--space-3);
+        }
+        .dc-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+        .device-card.online  .dc-icon { background: rgba(0,255,136,0.12); color: var(--success); }
+        .device-card.warning .dc-icon { background: rgba(255,204,0,0.12);  color: var(--warning); }
+        .device-card.offline .dc-icon { background: rgba(255,51,102,0.12); color: var(--error); }
+
+        .dc-status {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: var(--text-xs);
+            font-weight: var(--font-medium);
+            padding: 3px 10px;
+            border-radius: var(--radius-full);
+        }
+        .dc-status.online  { background: rgba(0,255,136,0.12); color: var(--success); }
+        .dc-status.warning { background: rgba(255,204,0,0.12);  color: var(--warning); }
+        .dc-status.offline { background: rgba(255,51,102,0.12); color: var(--error); }
+
+        .status-dot {
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+        }
+        .dc-status.online  .status-dot { background: var(--success); box-shadow: 0 0 6px var(--success); animation: pulse-green 2s infinite; }
+        .dc-status.warning .status-dot { background: var(--warning); box-shadow: 0 0 6px var(--warning); animation: pulse-warn 1.5s infinite; }
+        .dc-status.offline .status-dot { background: var(--error); }
+
+        @keyframes pulse-green {
+            0%,100% { box-shadow: 0 0 4px var(--success); }
+            50%      { box-shadow: 0 0 10px var(--success); }
+        }
+        @keyframes pulse-warn {
+            0%,100% { box-shadow: 0 0 4px var(--warning); }
+            50%      { box-shadow: 0 0 10px var(--warning); }
+        }
+
+        .dc-body { }
+        .dc-name { font-size: var(--text-sm); font-weight: var(--font-semibold); color: var(--text-primary); margin-bottom: 4px; }
+        .dc-location { font-size: var(--text-xs); color: var(--text-tertiary); margin-bottom: var(--space-3); display: flex; align-items: center; gap: 4px; }
+
+        .dc-metrics {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: var(--space-2);
+        }
+        .dc-metric {
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            padding: 6px 8px;
+        }
+        .dc-metric-label { font-size: 10px; color: var(--text-tertiary); margin-bottom: 2px; }
+        .dc-metric-val   { font-size: var(--text-sm); font-weight: var(--font-medium); color: var(--text-primary); }
+        .dc-metric-val.warn { color: var(--warning); }
+        .dc-metric-val.err  { color: var(--error); }
+        .dc-metric-val.ok   { color: var(--success); }
+
+        .dc-footer {
+            margin-top: var(--space-3);
+            padding-top: var(--space-3);
+            border-top: 1px solid var(--border-light);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+        }
+
+        /* 分页 */
+        .pagination {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: var(--space-2);
+            margin-top: var(--space-6);
+            padding-top: var(--space-4);
+            border-top: 1px solid var(--border-light);
+        }
+        .page-btn {
+            width: 36px; height: 36px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-card);
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
+            cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .page-btn:hover, .page-btn.active { border-color: var(--primary-500); color: var(--primary-400); background: rgba(0,191,255,0.08); }
+        .page-btn.active { background: var(--primary-500); color: #fff; border-color: var(--primary-500); }
+        .page-total { font-size: var(--text-sm); color: var(--text-tertiary); margin-left: var(--space-3); }
+
+        /* 设备详情抽屉 */
+        .drawer-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: rgba(0,0,0,0.55);
+            backdrop-filter: blur(3px);
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            pointer-events: none;
+        }
+        .drawer-overlay.show { opacity: 1; pointer-events: auto; }
+
+        .drawer {
+            position: fixed;
+            top: 0; right: 0; bottom: 0;
+            width: 480px;
+            max-width: 95vw;
+            background: linear-gradient(180deg, #0a1429, #050a14);
+            border-left: 1px solid var(--border-color);
+            box-shadow: -8px 0 32px rgba(0,0,0,0.6);
+            transform: translateX(100%);
+            transition: transform 0.3s cubic-bezier(0.4,0,0.2,1);
+            z-index: 2001;
+            display: flex;
+            flex-direction: column;
+        }
+        .drawer.show { transform: translateX(0); }
+
+        .drawer-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--space-5) var(--space-6);
+            border-bottom: 1px solid var(--border-light);
+            flex-shrink: 0;
+        }
+        .drawer-title { font-size: var(--text-lg); font-weight: var(--font-semibold); color: var(--text-primary); display: flex; align-items: center; gap: var(--space-3); }
+        .drawer-close {
+            width: 32px; height: 32px;
+            display: flex; align-items: center; justify-content: center;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: none;
+            color: var(--text-tertiary);
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all var(--transition-fast);
+        }
+        .drawer-close:hover { border-color: var(--primary-500); color: var(--primary-400); }
+
+        .drawer-body { flex: 1; overflow-y: auto; padding: var(--space-6); }
+        .drawer-body::-webkit-scrollbar { width: 4px; }
+        .drawer-body::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 2px; }
+
+        .drawer-section { margin-bottom: var(--space-6); }
+        .drawer-section-title {
+            font-size: var(--text-xs);
+            color: var(--text-tertiary);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            margin-bottom: var(--space-3);
+            display: flex;
+            align-items: center;
+            gap: var(--space-2);
+        }
+        .drawer-section-title::after {
+            content: '';
+            flex: 1;
+            height: 1px;
+            background: var(--border-light);
+        }
+
+        .info-grid { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+        .info-item { background: var(--bg-tertiary); border-radius: var(--radius-md); padding: var(--space-3) var(--space-4); }
+        .info-label { font-size: var(--text-xs); color: var(--text-tertiary); margin-bottom: 4px; }
+        .info-value { font-size: var(--text-sm); font-weight: var(--font-medium); color: var(--text-primary); }
+        .info-value.ok   { color: var(--success); }
+        .info-value.warn { color: var(--warning); }
+        .info-value.err  { color: var(--error); }
+
+        .event-list { display: flex; flex-direction: column; gap: var(--space-3); }
+        .event-item {
+            display: flex;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-md);
+            border-left: 3px solid var(--border-color);
+        }
+        .event-item.warn { border-left-color: var(--warning); }
+        .event-item.err  { border-left-color: var(--error); }
+        .event-item.ok   { border-left-color: var(--success); }
+        .event-icon { width: 28px; height: 28px; border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 0.8rem; flex-shrink: 0; }
+        .event-item.ok   .event-icon { background: rgba(0,255,136,0.1);  color: var(--success); }
+        .event-item.warn .event-icon { background: rgba(255,204,0,0.1);  color: var(--warning); }
+        .event-item.err  .event-icon { background: rgba(255,51,102,0.1); color: var(--error); }
+        .event-content { flex: 1; }
+        .event-msg  { font-size: var(--text-sm); color: var(--text-primary); margin-bottom: 2px; }
+        .event-time { font-size: var(--text-xs); color: var(--text-tertiary); }
+
+        .progress-bar {
+            height: 6px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-full);
+            overflow: hidden;
+            margin-top: 6px;
+        }
+        .progress-fill { height: 100%; border-radius: var(--radius-full); transition: width 0.6s ease; }
+        .progress-fill.ok   { background: linear-gradient(90deg, var(--success), rgba(0,255,136,0.5)); }
+        .progress-fill.warn { background: linear-gradient(90deg, var(--warning), rgba(255,204,0,0.5)); }
+        .progress-fill.err  { background: linear-gradient(90deg, var(--error), rgba(255,51,102,0.5)); }
+
+        /* 响应式 */
+        @media (max-width: 1400px) { .device-grid { grid-template-columns: repeat(3, 1fr); } .monitor-summary { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 900px)  { .device-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 600px)  { .device-grid { grid-template-columns: 1fr; } .monitor-summary { grid-template-columns: 1fr 1fr; } }
+
+        .user-dropdown.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+    
+        /* 用户下拉菜单样式 */
+        .user-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 220px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all var(--transition-fast);
+            z-index: 1000;
+        }
+
+        .user-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+        }
+
+        .user-menu-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .user-menu-info {
+            flex: 1;
+        }
+
+        .user-menu-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+        }
+
+        .user-menu-role {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: var(--space-2) 0;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .user-menu-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .user-menu-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .user-menu-item.logout {
+            color: var(--danger-500);
+        }
+
+        .user-menu-item.logout:hover {
+            background: var(--danger-500);
+            color: white;
+        }
+
+        /* 下拉箭头旋转动画 */
+        .user-dropdown .fa-chevron-down {
+            transition: transform var(--transition-fast);
+        }
+
+        .user-dropdown.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+</style>
+</head>
+<body>
+<div class="app-container">
+    <!-- 侧边栏 -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="logo">
+                <i class="fas fa-cube"></i>
+                <span>智能柜系统</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <ul class="nav-list">
+                <li class="nav-item">
+                    <a href="../index.html" class="nav-link">
+                        <i class="fas fa-home"></i>
+                        <span>工作台</span>
+                    </a>
+                </li>
+                <li class="nav-item active">
+                    <a href="device-monitor.html" class="nav-link">
+                        <i class="fas fa-desktop"></i>
+                        <span>设备监控中心</span>
+                    </a>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-box"></i>
+                        <span>基础管理</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="product.html">商品档案</a></li>
+                        <li><a href="supplier.html">供应商管理</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-qrcode"></i>
+                        <span>赋码管理</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="coding-task.html">赋码任务</a></li>
+                        <li><a href="code-contrast.html">标签对照</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-cog"></i>
+                        <span>系统管理</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="organization.html">组织架构</a></li>
+                        <li><a href="device.html">设备管理</a></li>
+                        <li><a href="user.html">用户权限</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-warehouse"></i>
+                        <span>库存管理</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="inventory.html">库存查询</a></li>
+                        <li><a href="warning.html">库存预警</a></li>
+                        <li><a href="replenish.html">补货管理</a></li>
+                        <li><a href="stocktaking.html">盘点管理</a></li>
+                    </ul>
+                </li>
+                <li class="nav-item has-submenu">
+                    <a href="#" class="nav-link">
+                        <i class="fas fa-chart-bar"></i>
+                        <span>查询统计</span>
+                        <i class="fas fa-chevron-right arrow"></i>
+                    </a>
+                    <ul class="submenu">
+                        <li><a href="query.html">业务查询</a></li>
+                        <li><a href="report.html">统计报表</a></li>
+                        <li><a href="trace.html">追溯中心</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- 主内容区 -->
+    <main class="main-content">
+        <!-- 顶部导航 -->
+        <header class="top-header">
+            <button class="menu-toggle" id="menuToggle">
+                <i class="fas fa-bars"></i>
+            </button>
+            <div class="breadcrumb">
+                <a href="../index.html" style="color:var(--text-secondary);text-decoration:none;">首页</a>
+                <i class="fas fa-chevron-right"></i>
+                <span>系统管理</span>
+                <i class="fas fa-chevron-right"></i>
+                <span class="current">设备监控</span>
+            </div>
+            <div class="header-right">
+                <div class="search-box">
+                    <i class="fas fa-search"></i>
+                    <input type="text" placeholder="全局搜索...">
+                </div>
+                <div class="header-actions">
+                    <button class="action-btn" onclick="location.href='todo-list.html'" title="待办事项">
+                        <i class="fas fa-bell"></i>
+                        <span class="badge"></span>
+                    </button>
+                    <div class="user-dropdown" id="userDropdown" style="position:relative;">
+                        <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-avatar">
+                        <span class="user-name">系统管理员</span>
+                        <i class="fas fa-chevron-down"></i>
+                        <!-- 用户下拉菜单 -->
+                        <div class="user-menu" id="userMenu">
+                            <div class="user-menu-header">
+                                <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-menu-avatar">
+                                <div class="user-menu-info">
+                                    <div class="user-menu-name">系统管理员</div>
+                                    <div class="user-menu-role">超级管理员</div>
+                                </div>
+                            </div>
+                            <div class="user-menu-divider"></div>
+                            <a href="javascript:void(0);" class="user-menu-item" onclick="openPersonalSettingsModal()">
+                                <i class="fas fa-user-cog"></i>
+                                <span>个人设置</span>
+                            </a>
+                            <div class="user-menu-divider"></div>
+                            <a href="../login.html" class="user-menu-item logout">
+                                <i class="fas fa-sign-out-alt"></i>
+                                <span>退出登录</span>
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- 页面内容 -->
+        <div class="page-content">
+
+            <!-- 页面标题 -->
+            <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:var(--space-6);">
+                <div>
+                    <h2 style="font-size:var(--text-xl);font-weight:var(--font-semibold);color:var(--text-primary);margin-bottom:4px;display:flex;align-items:center;gap:var(--space-3);">
+                        <i class="fas fa-desktop" style="color:var(--primary-400);"></i>
+                        设备监控中心
+                    </h2>
+                    <p style="font-size:var(--text-sm);color:var(--text-tertiary);">实时掌握全院 48 台智能柜运行状态</p>
+                </div>
+                <div style="display:flex;align-items:center;gap:var(--space-3);">
+                    <span style="font-size:var(--text-xs);color:var(--text-tertiary);"><i class="fas fa-circle" style="color:var(--success);font-size:8px;margin-right:4px;"></i>实时刷新</span>
+                    <button class="btn btn-primary" onclick="location.href='device.html'"><i class="fas fa-cog" style="margin-right:6px;"></i>设备管理</button>
+                </div>
+            </div>
+
+            <!-- 概览统计 -->
+            <div class="monitor-summary">
+                <div class="summary-card">
+                    <div class="summary-icon total"><i class="fas fa-server"></i></div>
+                    <div class="summary-info">
+                        <div class="summary-value">48</div>
+                        <div class="summary-label">设备总数</div>
+                        <div class="summary-rate up"><i class="fas fa-building" style="margin-right:3px;"></i>覆盖全院 12 个科室</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon online"><i class="fas fa-wifi"></i></div>
+                    <div class="summary-info">
+                        <div class="summary-value" style="color:var(--success);">45</div>
+                        <div class="summary-label">在线设备</div>
+                        <div class="summary-rate up"><i class="fas fa-arrow-up" style="margin-right:3px;"></i>在线率 93.8%</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
+                    <div class="summary-info">
+                        <div class="summary-value" style="color:var(--warning);">2</div>
+                        <div class="summary-label">预警设备</div>
+                        <div class="summary-rate warn"><i class="fas fa-clock" style="margin-right:3px;"></i>需及时处理</div>
+                    </div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-icon offline"><i class="fas fa-times-circle"></i></div>
+                    <div class="summary-info">
+                        <div class="summary-value" style="color:var(--error);">1</div>
+                        <div class="summary-label">离线设备</div>
+                        <div class="summary-rate err"><i class="fas fa-wrench" style="margin-right:3px;"></i>骨科副柜网络异常</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 工具栏 -->
+            <div class="toolbar">
+                <div class="toolbar-left">
+                    <button class="filter-btn active" id="filterAll" onclick="filterDevices('all')">
+                        <i class="fas fa-th-large"></i> 全部 <span class="count">48</span>
+                    </button>
+                    <button class="filter-btn" id="filterOnline" onclick="filterDevices('online')">
+                        <i class="fas fa-wifi" style="color:var(--success);"></i> 在线 <span class="count" style="background:var(--success);">45</span>
+                    </button>
+                    <button class="filter-btn warning-btn" id="filterWarning" onclick="filterDevices('warning')">
+                        <i class="fas fa-exclamation-triangle" style="color:var(--warning);"></i> 预警 <span class="count">2</span>
+                    </button>
+                    <button class="filter-btn offline-btn" id="filterOffline" onclick="filterDevices('offline')">
+                        <i class="fas fa-times-circle" style="color:var(--error);"></i> 离线 <span class="count">1</span>
+                    </button>
+                    <div class="search-input">
+                        <i class="fas fa-search" style="color:var(--text-tertiary);flex-shrink:0;"></i>
+                        <input type="text" id="deviceSearch" placeholder="搜索设备名称、位置..." oninput="searchDevices(this.value)">
+                    </div>
+                </div>
+                <div class="toolbar-right">
+                    <select style="padding:8px 14px;border-radius:var(--radius-md);border:1px solid var(--border-color);background:var(--bg-card);color:var(--text-secondary);font-size:var(--text-sm);outline:none;cursor:pointer;" onchange="filterByDept(this.value)">
+                        <option value="">全部科室</option>
+                        <option value="手术室">手术室</option>
+                        <option value="急诊">急诊科</option>
+                        <option value="ICU">ICU</option>
+                        <option value="骨科">骨科</option>
+                        <option value="心内科">心内科</option>
+                        <option value="儿科">儿科</option>
+                        <option value="神经外科">神经外科</option>
+                        <option value="呼吸科">呼吸科</option>
+                        <option value="消化科">消化科</option>
+                        <option value="泌尿外科">泌尿外科</option>
+                        <option value="妇产科">妇产科</option>
+                        <option value="门诊">门诊药房</option>
+                    </select>
+                    <button class="btn btn-text" onclick="refreshAll()"><i class="fas fa-sync-alt" style="margin-right:6px;"></i>刷新</button>
+                </div>
+            </div>
+
+            <!-- 设备网格 -->
+            <div class="card">
+                <div class="card-body">
+                    <div class="device-grid" id="deviceGrid">
+                        <!-- 由JS动态生成 -->
+                    </div>
+                    <!-- 无结果提示 -->
+                    <div id="emptyTip" style="display:none;text-align:center;padding:60px 0;color:var(--text-tertiary);">
+                        <i class="fas fa-search" style="font-size:2rem;margin-bottom:12px;opacity:.4;"></i>
+                        <div>未找到匹配的设备</div>
+                    </div>
+                </div>
+                <div class="pagination" id="pagination"></div>
+            </div>
+        </div>
+    </main>
+</div>
+
+<!-- 设备详情抽屉 -->
+<div class="drawer-overlay" id="drawerOverlay" onclick="closeDrawer()"></div>
+<div class="drawer" id="deviceDrawer">
+    <div class="drawer-header">
+        <div class="drawer-title">
+            <i class="fas fa-server" style="color:var(--primary-400);"></i>
+            <span id="drawerDeviceName">设备详情</span>
+        </div>
+        <button class="drawer-close" onclick="closeDrawer()"><i class="fas fa-times"></i></button>
+    </div>
+    <div class="drawer-body" id="drawerBody">
+        <!-- 动态填充 -->
+    </div>
+</div>
+
+<script src="../js/app.js"></script>
+<script>
+// 48台设备数据
+const DEVICES = [
+    { id:'A01', name:'手术室-主柜-A01', dept:'手术室', location:'1号住院楼 3层 手术室', status:'online', ip:'192.168.1.101', firmware:'v2.3.1', stock:86, capacity:100, lastSync:'2分钟前', uptime:'99.8%', temp:'36°C', events:[{type:'ok',msg:'设备自检通过',time:'10:05'},{type:'ok',msg:'库存同步完成',time:'09:30'}] },
+    { id:'A02', name:'手术室-副柜-A02', dept:'手术室', location:'1号住院楼 3层 手术室', status:'online', ip:'192.168.1.102', firmware:'v2.3.1', stock:72, capacity:80, lastSync:'3分钟前', uptime:'99.5%', temp:'35°C', events:[{type:'ok',msg:'补货完成',time:'08:20'},{type:'ok',msg:'设备自检通过',time:'07:00'}] },
+    { id:'B01', name:'急诊室-主柜-B01', dept:'急诊', location:'急诊科 1层 抢救室', status:'online', ip:'192.168.1.111', firmware:'v2.3.0', stock:54, capacity:80, lastSync:'1分钟前', uptime:'99.9%', temp:'34°C', events:[{type:'warn',msg:'库存低于预警线',time:'09:45'},{type:'ok',msg:'设备自检通过',time:'06:00'}] },
+    { id:'B02', name:'急诊室-主柜-B02', dept:'急诊', location:'急诊科 1层 留观室', status:'online', ip:'192.168.1.112', firmware:'v2.3.0', stock:61, capacity:80, lastSync:'5分钟前', uptime:'98.7%', temp:'35°C', events:[{type:'ok',msg:'库存同步完成',time:'10:00'}] },
+    { id:'B03', name:'急诊室-副柜-B03', dept:'急诊', location:'急诊科 1层', status:'online', ip:'192.168.1.113', firmware:'v2.3.0', stock:68, capacity:80, lastSync:'2分钟前', uptime:'99.2%', temp:'35°C', events:[{type:'ok',msg:'设备在线',time:'10:02'}] },
+    { id:'C01', name:'ICU-主柜-C01', dept:'ICU', location:'2号住院楼 5层 ICU-A区', status:'online', ip:'192.168.1.121', firmware:'v2.3.1', stock:91, capacity:100, lastSync:'1分钟前', uptime:'99.9%', temp:'36°C', events:[{type:'ok',msg:'设备自检通过',time:'10:05'}] },
+    { id:'C02', name:'ICU-主柜-C02', dept:'ICU', location:'2号住院楼 5层 ICU-B区', status:'warning', ip:'192.168.1.122', firmware:'v2.2.9', stock:23, capacity:100, lastSync:'15分钟前', uptime:'94.2%', temp:'42°C', events:[{type:'err',msg:'温度异常，超过阈值',time:'09:50'},{type:'warn',msg:'库存严重不足',time:'09:30'},{type:'ok',msg:'上次自检通过',time:'08:00'}] },
+    { id:'C03', name:'ICU-副柜-C03', dept:'ICU', location:'2号住院楼 5层 ICU-C区', status:'online', ip:'192.168.1.123', firmware:'v2.3.1', stock:78, capacity:80, lastSync:'3分钟前', uptime:'99.1%', temp:'35°C', events:[{type:'ok',msg:'库存同步完成',time:'09:58'}] },
+    { id:'D01', name:'骨科-主柜-D01', dept:'骨科', location:'2号住院楼 3层 骨科护士站', status:'online', ip:'192.168.1.131', firmware:'v2.3.0', stock:65, capacity:80, lastSync:'4分钟前', uptime:'98.5%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'09:55'}] },
+    { id:'D02', name:'骨科-主柜-D02', dept:'骨科', location:'2号住院楼 3层 骨科手术备料', status:'online', ip:'192.168.1.132', firmware:'v2.3.0', stock:48, capacity:80, lastSync:'6分钟前', uptime:'97.8%', temp:'35°C', events:[{type:'warn',msg:'库存低于预警值',time:'09:40'}] },
+    { id:'D03', name:'骨科-副柜-D03', dept:'骨科', location:'2号住院楼 3层 骨科备用', status:'online', ip:'192.168.1.133', firmware:'v2.3.0', stock:72, capacity:80, lastSync:'5分钟前', uptime:'98.2%', temp:'34°C', events:[{type:'ok',msg:'设备正常',time:'09:50'}] },
+    { id:'D04', name:'骨科-副柜-D04', dept:'骨科', location:'2号住院楼 4层 脊柱外科', status:'online', ip:'192.168.1.134', firmware:'v2.2.9', stock:59, capacity:80, lastSync:'8分钟前', uptime:'97.5%', temp:'35°C', events:[{type:'ok',msg:'同步完成',time:'09:30'}] },
+    { id:'D05', name:'骨科-副柜-D05', dept:'骨科', location:'2号住院楼 3层 骨科', status:'offline', ip:'192.168.1.135', firmware:'v2.2.8', stock:0, capacity:80, lastSync:'2小时前', uptime:'78.3%', temp:'--', events:[{type:'err',msg:'网络断开，无法连接',time:'08:15'},{type:'err',msg:'多次重连失败',time:'08:20'},{type:'warn',msg:'上次在线时库存偏低',time:'06:00'}] },
+    { id:'E01', name:'心内科-主柜-E01', dept:'心内科', location:'1号住院楼 4层 心内科护士站', status:'online', ip:'192.168.1.141', firmware:'v2.3.1', stock:83, capacity:100, lastSync:'2分钟前', uptime:'99.7%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'10:00'}] },
+    { id:'E02', name:'心内科-副柜-E02', dept:'心内科', location:'1号住院楼 4层 CCU', status:'online', ip:'192.168.1.142', firmware:'v2.3.1', stock:76, capacity:80, lastSync:'3分钟前', uptime:'99.3%', temp:'35°C', events:[{type:'ok',msg:'库存同步',time:'09:55'}] },
+    { id:'E03', name:'心内科-副柜-E03', dept:'心内科', location:'1号住院楼 4层 导管室', status:'online', ip:'192.168.1.143', firmware:'v2.3.0', stock:64, capacity:80, lastSync:'5分钟前', uptime:'98.9%', temp:'35°C', events:[{type:'ok',msg:'设备正常',time:'09:45'}] },
+    { id:'F01', name:'儿科-主柜-F01', dept:'儿科', location:'门诊楼 2层 儿科病房', status:'online', ip:'192.168.1.151', firmware:'v2.3.1', stock:88, capacity:100, lastSync:'1分钟前', uptime:'99.8%', temp:'34°C', events:[{type:'ok',msg:'自检通过',time:'10:05'}] },
+    { id:'F02', name:'儿科-副柜-F02', dept:'儿科', location:'门诊楼 2层 儿科', status:'online', ip:'192.168.1.152', firmware:'v2.3.0', stock:71, capacity:80, lastSync:'4分钟前', uptime:'99.0%', temp:'34°C', events:[{type:'ok',msg:'库存同步完成',time:'09:58'}] },
+    { id:'F03', name:'儿科-副柜-F03', dept:'儿科', location:'门诊楼 2层 儿科急诊', status:'online', ip:'192.168.1.153', firmware:'v2.3.0', stock:55, capacity:80, lastSync:'6分钟前', uptime:'98.6%', temp:'34°C', events:[{type:'ok',msg:'设备在线',time:'09:50'}] },
+    { id:'G01', name:'神外-主柜-G01', dept:'神经外科', location:'3号住院楼 2层 神经外科', status:'online', ip:'192.168.1.161', firmware:'v2.3.1', stock:79, capacity:100, lastSync:'2分钟前', uptime:'99.6%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'10:00'}] },
+    { id:'G02', name:'神外-副柜-G02', dept:'神经外科', location:'3号住院楼 2层 神外手术', status:'online', ip:'192.168.1.162', firmware:'v2.3.0', stock:62, capacity:80, lastSync:'5分钟前', uptime:'98.8%', temp:'35°C', events:[{type:'ok',msg:'设备正常',time:'09:45'}] },
+    { id:'H01', name:'呼吸科-主柜-H01', dept:'呼吸科', location:'1号住院楼 5层 呼吸科', status:'online', ip:'192.168.1.171', firmware:'v2.3.1', stock:85, capacity:100, lastSync:'2分钟前', uptime:'99.5%', temp:'35°C', events:[{type:'ok',msg:'同步完成',time:'10:02'}] },
+    { id:'H02', name:'呼吸科-副柜-H02', dept:'呼吸科', location:'1号住院楼 5层 呼吸ICU', status:'online', ip:'192.168.1.172', firmware:'v2.3.0', stock:67, capacity:80, lastSync:'4分钟前', uptime:'98.7%', temp:'35°C', events:[{type:'ok',msg:'设备正常',time:'09:50'}] },
+    { id:'H03', name:'呼吸科-副柜-H03', dept:'呼吸科', location:'1号住院楼 5层 雾化室', status:'warning', ip:'192.168.1.173', firmware:'v2.2.9', stock:18, capacity:80, lastSync:'20分钟前', uptime:'91.3%', temp:'38°C', events:[{type:'warn',msg:'库存严重不足，请及时补货',time:'09:40'},{type:'warn',msg:'同步延迟超过阈值',time:'09:20'}] },
+    { id:'I01', name:'消化科-主柜-I01', dept:'消化科', location:'2号住院楼 2层 消化科', status:'online', ip:'192.168.1.181', firmware:'v2.3.1', stock:77, capacity:100, lastSync:'3分钟前', uptime:'99.3%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'10:00'}] },
+    { id:'I02', name:'消化科-副柜-I02', dept:'消化科', location:'2号住院楼 2层 内镜室', status:'online', ip:'192.168.1.182', firmware:'v2.3.0', stock:59, capacity:80, lastSync:'6分钟前', uptime:'98.4%', temp:'35°C', events:[{type:'ok',msg:'设备正常',time:'09:45'}] },
+    { id:'J01', name:'泌尿外科-主柜-J01', dept:'泌尿外科', location:'3号住院楼 3层 泌尿外科', status:'online', ip:'192.168.1.191', firmware:'v2.3.1', stock:81, capacity:100, lastSync:'2分钟前', uptime:'99.7%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'10:03'}] },
+    { id:'J02', name:'泌尿外科-副柜-J02', dept:'泌尿外科', location:'3号住院楼 3层 腔镜室', status:'online', ip:'192.168.1.192', firmware:'v2.3.0', stock:63, capacity:80, lastSync:'5分钟前', uptime:'98.9%', temp:'35°C', events:[{type:'ok',msg:'设备正常',time:'09:50'}] },
+    { id:'K01', name:'妇产科-主柜-K01', dept:'妇产科', location:'4号住院楼 1层 产科', status:'online', ip:'192.168.1.201', firmware:'v2.3.1', stock:92, capacity:100, lastSync:'1分钟前', uptime:'99.9%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'10:05'}] },
+    { id:'K02', name:'妇产科-副柜-K02', dept:'妇产科', location:'4号住院楼 2层 妇科', status:'online', ip:'192.168.1.202', firmware:'v2.3.1', stock:74, capacity:80, lastSync:'3分钟前', uptime:'99.4%', temp:'35°C', events:[{type:'ok',msg:'库存同步',time:'10:00'}] },
+    { id:'K03', name:'妇产科-副柜-K03', dept:'妇产科', location:'4号住院楼 1层 手术室', status:'online', ip:'192.168.1.203', firmware:'v2.3.0', stock:68, capacity:80, lastSync:'4分钟前', uptime:'99.1%', temp:'34°C', events:[{type:'ok',msg:'设备正常',time:'09:55'}] },
+    { id:'L01', name:'门诊药房-主柜-L01', dept:'门诊', location:'门诊楼 1层 药房A', status:'online', ip:'192.168.1.211', firmware:'v2.3.1', stock:95, capacity:120, lastSync:'1分钟前', uptime:'99.9%', temp:'34°C', events:[{type:'ok',msg:'自检通过',time:'10:05'}] },
+    { id:'L02', name:'门诊药房-主柜-L02', dept:'门诊', location:'门诊楼 1层 药房B', status:'online', ip:'192.168.1.212', firmware:'v2.3.1', stock:88, capacity:120, lastSync:'2分钟前', uptime:'99.8%', temp:'34°C', events:[{type:'ok',msg:'库存同步',time:'10:02'}] },
+    { id:'L03', name:'门诊药房-副柜-L03', dept:'门诊', location:'门诊楼 1层 药房C', status:'online', ip:'192.168.1.213', firmware:'v2.3.0', stock:76, capacity:100, lastSync:'3分钟前', uptime:'99.5%', temp:'34°C', events:[{type:'ok',msg:'设备正常',time:'10:00'}] },
+    { id:'L04', name:'门诊药房-副柜-L04', dept:'门诊', location:'门诊楼 2层 诊室备药', status:'online', ip:'192.168.1.214', firmware:'v2.3.0', stock:61, capacity:80, lastSync:'5分钟前', uptime:'98.8%', temp:'34°C', events:[{type:'ok',msg:'自检通过',time:'09:55'}] },
+    { id:'A03', name:'手术室-副柜-A03', dept:'手术室', location:'1号住院楼 3层 手术间3', status:'online', ip:'192.168.1.103', firmware:'v2.3.1', stock:84, capacity:100, lastSync:'2分钟前', uptime:'99.6%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'10:04'}] },
+    { id:'A04', name:'手术室-副柜-A04', dept:'手术室', location:'1号住院楼 3层 手术间4', status:'online', ip:'192.168.1.104', firmware:'v2.3.1', stock:79, capacity:100, lastSync:'3分钟前', uptime:'99.4%', temp:'35°C', events:[{type:'ok',msg:'库存同步完成',time:'09:58'}] },
+    { id:'G03', name:'神外-副柜-G03', dept:'神经外科', location:'3号住院楼 2层 神外ICU', status:'online', ip:'192.168.1.163', firmware:'v2.3.0', stock:71, capacity:80, lastSync:'4分钟前', uptime:'99.0%', temp:'35°C', events:[{type:'ok',msg:'设备正常',time:'09:52'}] },
+    { id:'I03', name:'消化科-副柜-I03', dept:'消化科', location:'2号住院楼 2层 消化内镜备料', status:'online', ip:'192.168.1.183', firmware:'v2.3.0', stock:55, capacity:80, lastSync:'7分钟前', uptime:'98.1%', temp:'35°C', events:[{type:'ok',msg:'设备正常',time:'09:40'}] },
+    { id:'J03', name:'泌尿外科-副柜-J03', dept:'泌尿外科', location:'3号住院楼 4层 结石碎石室', status:'online', ip:'192.168.1.193', firmware:'v2.3.0', stock:66, capacity:80, lastSync:'5分钟前', uptime:'98.6%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'09:48'}] },
+    { id:'H04', name:'呼吸科-副柜-H04', dept:'呼吸科', location:'1号住院楼 6层 结核病区', status:'online', ip:'192.168.1.174', firmware:'v2.3.1', stock:70, capacity:80, lastSync:'3分钟前', uptime:'99.2%', temp:'34°C', events:[{type:'ok',msg:'设备正常',time:'09:55'}] },
+    { id:'E04', name:'心内科-副柜-E04', dept:'心内科', location:'1号住院楼 4层 电生理室', status:'online', ip:'192.168.1.144', firmware:'v2.3.1', stock:73, capacity:80, lastSync:'3分钟前', uptime:'99.1%', temp:'35°C', events:[{type:'ok',msg:'库存同步',time:'09:57'}] },
+    { id:'F04', name:'儿科-副柜-F04', dept:'儿科', location:'门诊楼 3层 新生儿科', status:'online', ip:'192.168.1.154', firmware:'v2.3.1', stock:80, capacity:80, lastSync:'2分钟前', uptime:'99.7%', temp:'33°C', events:[{type:'ok',msg:'自检通过',time:'10:02'}] },
+    { id:'K04', name:'妇产科-副柜-K04', dept:'妇产科', location:'4号住院楼 3层 不孕不育', status:'online', ip:'192.168.1.204', firmware:'v2.3.0', stock:58, capacity:80, lastSync:'6分钟前', uptime:'98.5%', temp:'34°C', events:[{type:'ok',msg:'设备正常',time:'09:45'}] },
+    { id:'B04', name:'急诊室-副柜-B04', dept:'急诊', location:'急诊科 2层 急救备料', status:'online', ip:'192.168.1.114', firmware:'v2.3.1', stock:77, capacity:80, lastSync:'2分钟前', uptime:'99.6%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'10:03'}] },
+    { id:'L05', name:'门诊药房-副柜-L05', dept:'门诊', location:'门诊楼 3层 急诊药房', status:'online', ip:'192.168.1.215', firmware:'v2.3.1', stock:89, capacity:100, lastSync:'1分钟前', uptime:'99.8%', temp:'34°C', events:[{type:'ok',msg:'设备在线',time:'10:05'}] },
+    { id:'D06', name:'骨科-副柜-D06', dept:'骨科', location:'2号住院楼 4层 运动医学', status:'online', ip:'192.168.1.136', firmware:'v2.3.0', stock:64, capacity:80, lastSync:'5分钟前', uptime:'98.3%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'09:50'}] },
+    { id:'C04', name:'ICU-副柜-C04', dept:'ICU', location:'2号住院楼 5层 ICU备用间', status:'online', ip:'192.168.1.124', firmware:'v2.3.1', stock:90, capacity:100, lastSync:'2分钟前', uptime:'99.5%', temp:'35°C', events:[{type:'ok',msg:'库存同步完成',time:'10:01'}] },
+    { id:'A05', name:'手术室-副柜-A05', dept:'手术室', location:'1号住院楼 3层 麻醉准备室', status:'online', ip:'192.168.1.105', firmware:'v2.3.1', stock:88, capacity:100, lastSync:'1分钟前', uptime:'99.9%', temp:'34°C', events:[{type:'ok',msg:'自检通过',time:'10:06'}] },
+];
+
+// 分页配置
+const PAGE_SIZE = 16;
+let currentPage = 1;
+let filteredDevices = [...DEVICES];
+let currentFilter = 'all';
+let currentDept = '';
+let currentSearch = '';
+
+function getStatusLabel(s) {
+    return { online:'在线', warning:'预警', offline:'离线' }[s];
+}
+
+function getStockColor(stock, capacity) {
+    const ratio = stock / capacity;
+    if (ratio > 0.5) return 'ok';
+    if (ratio > 0.2) return 'warn';
+    return 'err';
+}
+
+function renderGrid() {
+    const grid = document.getElementById('deviceGrid');
+    const empty = document.getElementById('emptyTip');
+    const start = (currentPage - 1) * PAGE_SIZE;
+    const pageData = filteredDevices.slice(start, start + PAGE_SIZE);
+
+    if (filteredDevices.length === 0) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+        document.getElementById('pagination').innerHTML = '';
+        return;
+    }
+    empty.style.display = 'none';
+
+    grid.innerHTML = pageData.map(d => {
+        const stockColor = getStockColor(d.stock, d.capacity);
+        const stockPct = Math.round(d.stock / d.capacity * 100);
+        return `
+        <div class="device-card ${d.status}" onclick="openDrawer('${d.id}')">
+            <div class="dc-header">
+                <div class="dc-icon"><i class="fas fa-server"></i></div>
+                <div class="dc-status ${d.status}"><span class="status-dot"></span>${getStatusLabel(d.status)}</div>
+            </div>
+            <div class="dc-body">
+                <div class="dc-name">${d.name}</div>
+                <div class="dc-location"><i class="fas fa-map-marker-alt" style="font-size:10px;"></i>${d.location}</div>
+                <div class="dc-metrics">
+                    <div class="dc-metric">
+                        <div class="dc-metric-label">库存使用率</div>
+                        <div class="dc-metric-val ${stockColor}">${stockPct}%</div>
+                        <div class="progress-bar"><div class="progress-fill ${stockColor}" style="width:${stockPct}%"></div></div>
+                    </div>
+                    <div class="dc-metric">
+                        <div class="dc-metric-label">在线率</div>
+                        <div class="dc-metric-val ${d.status === 'offline' ? 'err' : 'ok'}">${d.uptime}</div>
+                    </div>
+                    <div class="dc-metric">
+                        <div class="dc-metric-label">设备温度</div>
+                        <div class="dc-metric-val ${d.temp !== '--' && parseInt(d.temp) > 40 ? 'warn' : ''}">${d.temp}</div>
+                    </div>
+                    <div class="dc-metric">
+                        <div class="dc-metric-label">同步时间</div>
+                        <div class="dc-metric-val" style="font-size:0.7rem;">${d.lastSync}</div>
+                    </div>
+                </div>
+            </div>
+            <div class="dc-footer">
+                <span><i class="fas fa-microchip" style="margin-right:3px;opacity:.6;"></i>${d.id}</span>
+                <span>${d.firmware}</span>
+            </div>
+        </div>`;
+    }).join('');
+
+    renderPagination();
+}
+
+function renderPagination() {
+    const total = filteredDevices.length;
+    const totalPages = Math.ceil(total / PAGE_SIZE);
+    const pag = document.getElementById('pagination');
+    if (totalPages <= 1) { pag.innerHTML = ''; return; }
+
+    let html = `<button class="page-btn" onclick="gotoPage(${currentPage-1})" ${currentPage===1?'disabled style="opacity:.4;cursor:not-allowed;"':''}><i class="fas fa-chevron-left"></i></button>`;
+    for (let i = 1; i <= totalPages; i++) {
+        html += `<button class="page-btn ${i===currentPage?'active':''}" onclick="gotoPage(${i})">${i}</button>`;
+    }
+    html += `<button class="page-btn" onclick="gotoPage(${currentPage+1})" ${currentPage===totalPages?'disabled style="opacity:.4;cursor:not-allowed;"':''}><i class="fas fa-chevron-right"></i></button>`;
+    html += `<span class="page-total">共 ${total} 台 / 第 ${currentPage}/${totalPages} 页</span>`;
+    pag.innerHTML = html;
+}
+
+function gotoPage(p) {
+    const max = Math.ceil(filteredDevices.length / PAGE_SIZE);
+    if (p < 1 || p > max) return;
+    currentPage = p;
+    renderGrid();
+    document.querySelector('.page-content').scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function applyFilters() {
+    currentPage = 1;
+    filteredDevices = DEVICES.filter(d => {
+        const matchStatus = currentFilter === 'all' || d.status === currentFilter;
+        const matchDept   = !currentDept || d.dept === currentDept || d.location.includes(currentDept);
+        const matchSearch = !currentSearch || d.name.toLowerCase().includes(currentSearch) || d.location.toLowerCase().includes(currentSearch) || d.id.toLowerCase().includes(currentSearch);
+        return matchStatus && matchDept && matchSearch;
+    });
+    renderGrid();
+}
+
+function filterDevices(status) {
+    currentFilter = status;
+    ['filterAll','filterOnline','filterWarning','filterOffline'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+    const map = { all:'filterAll', online:'filterOnline', warning:'filterWarning', offline:'filterOffline' };
+    document.getElementById(map[status])?.classList.add('active');
+    applyFilters();
+}
+
+function filterByDept(dept) {
+    currentDept = dept;
+    applyFilters();
+}
+
+function searchDevices(val) {
+    currentSearch = val.toLowerCase().trim();
+    applyFilters();
+}
+
+function refreshAll() {
+    document.querySelectorAll('.dc-metric-val').forEach(el => {
+        el.style.opacity = '0.3';
+        setTimeout(() => { el.style.opacity = '1'; }, 600);
+    });
+    if (window.App) App.toast.success('设备状态已刷新');
+}
+
+// 抽屉
+function openDrawer(id) {
+    const d = DEVICES.find(x => x.id === id);
+    if (!d) return;
+    document.getElementById('drawerDeviceName').textContent = d.name;
+
+    const stockColor = getStockColor(d.stock, d.capacity);
+    const stockPct = Math.round(d.stock / d.capacity * 100);
+    const statusMap = { online:'<span style="color:var(--success);">● 在线</span>', warning:'<span style="color:var(--warning);">● 预警</span>', offline:'<span style="color:var(--error);">● 离线</span>' };
+
+    document.getElementById('drawerBody').innerHTML = `
+        <div class="drawer-section">
+            <div class="drawer-section-title">基本信息</div>
+            <div class="info-grid">
+                <div class="info-item"><div class="info-label">设备编号</div><div class="info-value">${d.id}</div></div>
+                <div class="info-item"><div class="info-label">运行状态</div><div class="info-value">${statusMap[d.status]}</div></div>
+                <div class="info-item" style="grid-column:1/-1;"><div class="info-label">安装位置</div><div class="info-value"><i class="fas fa-map-marker-alt" style="color:var(--primary-400);margin-right:5px;"></i>${d.location}</div></div>
+                <div class="info-item"><div class="info-label">所属科室</div><div class="info-value">${d.dept}</div></div>
+                <div class="info-item"><div class="info-label">固件版本</div><div class="info-value">${d.firmware}</div></div>
+                <div class="info-item"><div class="info-label">设备IP</div><div class="info-value" style="font-family:monospace;">${d.ip}</div></div>
+                <div class="info-item"><div class="info-label">最后同步</div><div class="info-value">${d.lastSync}</div></div>
+            </div>
+        </div>
+        <div class="drawer-section">
+            <div class="drawer-section-title">运行指标</div>
+            <div class="info-grid">
+                <div class="info-item">
+                    <div class="info-label">库存使用率</div>
+                    <div class="info-value ${stockColor}">${d.stock} / ${d.capacity} (${stockPct}%)</div>
+                    <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill ${stockColor}" style="width:${stockPct}%;"></div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">设备在线率</div>
+                    <div class="info-value ${d.status === 'offline' ? 'err' : 'ok'}">${d.uptime}</div>
+                    <div class="progress-bar" style="margin-top:8px;"><div class="progress-fill ${d.status === 'offline' ? 'err' : 'ok'}" style="width:${parseFloat(d.uptime)}%;"></div></div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">设备温度</div>
+                    <div class="info-value ${d.temp !== '--' && parseInt(d.temp) > 40 ? 'warn' : d.temp !== '--' ? 'ok' : ''}">${d.temp}</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">当前库存量</div>
+                    <div class="info-value ${stockColor}">${d.stock} 件</div>
+                </div>
+            </div>
+        </div>
+        <div class="drawer-section">
+            <div class="drawer-section-title">近期事件</div>
+            <div class="event-list">
+                ${d.events.map(e => `
+                <div class="event-item ${e.type}">
+                    <div class="event-icon"><i class="fas ${e.type==='ok'?'fa-check':e.type==='warn'?'fa-exclamation-triangle':'fa-times-circle'}"></i></div>
+                    <div class="event-content">
+                        <div class="event-msg">${e.msg}</div>
+                        <div class="event-time"><i class="fas fa-clock" style="margin-right:3px;"></i>${e.time}</div>
+                    </div>
+                </div>`).join('')}
+            </div>
+        </div>
+        <div style="display:flex;gap:var(--space-3);margin-top:var(--space-4);">
+            <button class="btn btn-primary" style="flex:1;" onclick="App && App.toast.success('已发送设备重启指令')"><i class="fas fa-redo" style="margin-right:6px;"></i>重启设备</button>
+            <button class="btn" style="flex:1;background:rgba(255,255,255,0.06);border:1px solid var(--border-color);color:var(--text-secondary);" onclick="location.href='device.html'"><i class="fas fa-cog" style="margin-right:6px;"></i>设备配置</button>
+        </div>`;
+
+    document.getElementById('drawerOverlay').classList.add('show');
+    document.getElementById('deviceDrawer').classList.add('show');
+}
+
+function closeDrawer() {
+    document.getElementById('drawerOverlay').classList.remove('show');
+    document.getElementById('deviceDrawer').classList.remove('show');
+}
+
+// 侧边栏
+document.querySelectorAll('.nav-item.has-submenu > .nav-link').forEach(link => {
+    link.addEventListener('click', e => {
+        e.preventDefault();
+        link.parentElement.classList.toggle('active');
+        link.parentElement.querySelector('.submenu')?.classList.toggle('show');
+    });
+});
+document.getElementById('menuToggle').addEventListener('click', () => {
+    document.getElementById('sidebar').classList.toggle('collapsed');
+    document.querySelector('.main-content').classList.toggle('expanded');
+});
+
+// 用户下拉菜单交互
+const userDropdown = document.getElementById('userDropdown');
+const userMenu = document.getElementById('userMenu');
+
+if (userDropdown && userMenu) {
+    userDropdown.addEventListener('click', (e) => {
+        e.stopPropagation();
+        userDropdown.classList.toggle('active');
+        userMenu.classList.toggle('show');
+    });
+
+    document.addEventListener('click', (e) => {
+        if (!userDropdown.contains(e.target)) {
+            userDropdown.classList.remove('active');
+            userMenu.classList.remove('show');
+        }
+    });
+
+    const logoutBtn = document.querySelector('.user-menu-item.logout');
+    if (logoutBtn) {
+        logoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            if (typeof Modal !== 'undefined') {
+                Modal.confirm('确定要退出登录吗？', () => {
+                    window.location.href = logoutBtn.getAttribute('href');
+                });
+            } else {
+                if (confirm('确定要退出登录吗？')) {
+                    window.location.href = logoutBtn.getAttribute('href');
+                }
+            }
+        });
+    }
+}
+
+// 初始化渲染
+renderGrid();
+</script>
+</body>
+</html>

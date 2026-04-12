@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>设备管理 - 智能柜后台管理系统</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+        /* 用户下拉菜单样式 */
+        .user-dropdown {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .user-menu {
+            position: absolute;
+            top: calc(100% + 8px);
+            right: 0;
+            width: 220px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-lg);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all var(--transition-fast);
+            z-index: 1000;
+        }
+
+        .user-menu.show {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-4);
+        }
+
+        .user-menu-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+        }
+
+        .user-menu-info {
+            flex: 1;
+        }
+
+        .user-menu-name {
+            font-weight: var(--font-medium);
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+        }
+
+        .user-menu-role {
+            font-size: var(--text-xs);
+            color: var(--text-secondary);
+            margin-top: 2px;
+        }
+
+        .user-menu-divider {
+            height: 1px;
+            background: var(--border-color);
+            margin: var(--space-2) 0;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: var(--space-3);
+            padding: var(--space-3) var(--space-4);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-size: var(--text-sm);
+            transition: all var(--transition-fast);
+        }
+
+        .user-menu-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+
+        .user-menu-item i {
+            width: 16px;
+            text-align: center;
+        }
+
+        .user-menu-item.logout {
+            color: var(--danger-500);
+        }
+
+        .user-menu-item.logout:hover {
+            background: var(--danger-500);
+            color: white;
+        }
+
+        /* 下拉箭头旋转动画 */
+        .user-dropdown .fa-chevron-down {
+            transition: transform var(--transition-fast);
+        }
+
+        .user-dropdown.active .fa-chevron-down {
+            transform: rotate(180deg);
+        }
+</style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-cube"></i>
+                    <span>智能柜系统</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="../index.html" class="nav-link">
+                            <i class="fas fa-home"></i>
+                            <span>工作台</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="device-monitor.html" class="nav-link">
+                            <i class="fas fa-desktop"></i>
+                            <span>设备监控中心</span>
+                        </a>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>基础管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="product.html">商品档案</a></li>
+                            <li><a href="supplier.html">供应商管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-qrcode"></i>
+                            <span>赋码管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="coding-task.html">赋码任务</a></li>
+                            <li><a href="code-contrast.html">标签对照</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu active">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>系统管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu show">
+                            <li><a href="organization.html">组织架构</a></li>
+                            <li><a href="device.html" class="active">设备管理</a></li>
+                            <li><a href="user.html">用户权限</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-warehouse"></i>
+                            <span>库存管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="inventory.html">库存查询</a></li>
+                            <li><a href="warning.html">库存预警</a></li>
+                            <li><a href="replenish.html">补货管理</a></li>
+                            <li><a href="stocktaking.html">盘点管理</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>查询统计</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="query.html">业务查询</a></li>
+                            <li><a href="report.html">统计报表</a></li>
+                            <li><a href="trace.html">追溯中心</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <!-- 顶部导航 -->
+            <header class="top-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <span>系统管理</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <span class="current">设备管理</span>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="全局搜索...">
+                    </div>
+                    <div class="header-actions">
+                        <button class="action-btn" onclick="location.href='todo-list.html'" title="待办事项">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown" style="position:relative;">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-avatar">
+                            <span class="user-name">系统管理员</span>
+                            <i class="fas fa-chevron-down"></i>
+                            <!-- 用户下拉菜单 -->
+                            <div class="user-menu" id="userMenu">
+                                <div class="user-menu-header">
+                                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-menu-avatar">
+                                    <div class="user-menu-info">
+                                        <div class="user-menu-name">系统管理员</div>
+                                        <div class="user-menu-role">超级管理员</div>
+                                    </div>
+                                </div>
+                                <div class="user-menu-divider"></div>
+                                <a href="javascript:void(0);" class="user-menu-item" onclick="openPersonalSettingsModal()">
+                                    <i class="fas fa-user-cog"></i>
+                                    <span>个人设置</span>
+                                </a>
+                                <div class="user-menu-divider"></div>
+                                <a href="../login.html" class="user-menu-item logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>退出登录</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <div class="page-content">
+                <!-- 页面标题 -->
+                <div class="page-header">
+                    <div>
+                        <h1 class="page-title">设备管理</h1>
+                        <p class="page-desc">管理智能柜设备，监控设备状态，配置货道信息</p>
+                    </div>
+                    <div class="page-actions">
+                        <button class="btn btn-primary" onclick="openModal('addDeviceModal')">
+                            <i class="fas fa-plus"></i>
+                            新增设备
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 设备状态统计 -->
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon blue">
+                            <i class="fas fa-server"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">128</div>
+                            <div class="stat-label">设备总数</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">
+                            <i class="fas fa-check-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">118</div>
+                            <div class="stat-label">在线设备</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon red">
+                            <i class="fas fa-times-circle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">6</div>
+                            <div class="stat-label">离线设备</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon orange">
+                            <i class="fas fa-exclamation-triangle"></i>
+                        </div>
+                        <div class="stat-info">
+                            <div class="stat-value">4</div>
+                            <div class="stat-label">告警设备</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 筛选区域 -->
+                <div class="filter-section">
+                    <div class="filter-row">
+                        <div class="filter-item">
+                            <label>所属院区</label>
+                            <select class="form-select">
+                                <option value="">全部院区</option>
+                                <option value="main">主院区</option>
+                                <option value="east">东院区</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>所属科室</label>
+                            <select class="form-select">
+                                <option value="">全部科室</option>
+                                <option value="surgery">手术室</option>
+                                <option value="emergency">急诊科</option>
+                                <option value="icu">ICU</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>设备状态</label>
+                            <select class="form-select">
+                                <option value="">全部</option>
+                                <option value="online">在线</option>
+                                <option value="offline">离线</option>
+                                <option value="warning">告警</option>
+                            </select>
+                        </div>
+                        <div class="filter-item search-item">
+                            <label>关键词搜索</label>
+                            <div class="search-input-group">
+                                <input type="text" class="form-input" placeholder="设备编号/名称">
+                                <button class="btn btn-primary">
+                                    <i class="fas fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="filter-actions">
+                        <button class="btn btn-text">
+                            <i class="fas fa-undo"></i>
+                            重置
+                        </button>
+                        <button class="btn btn-primary">
+                            <i class="fas fa-filter"></i>
+                            筛选
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 设备列表 -->
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-list"></i>
+                            设备列表
+                        </h3>
+                        <div class="card-actions">
+                            <button class="btn btn-text" title="刷新">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-text" title="列设置">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="table-container">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th width="40">
+                                        <input type="checkbox" class="checkbox-all">
+                                    </th>
+                                    <th>设备编号</th>
+                                    <th>设备名称</th>
+                                    <th>所属科室</th>
+                                    <th>货道数量</th>
+                                    <th>库存量</th>
+                                    <th>状态</th>
+                                    <th>最后在线</th>
+                                    <th width="180">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox-item"></td>
+                                    <td><span class="code">SC-2024-001</span></td>
+                                    <td>手术室-01号柜</td>
+                                    <td>手术室</td>
+                                    <td>48</td>
+                                    <td>1,250</td>
+                                    <td><span class="badge badge-green">在线</span></td>
+                                    <td>2024-01-15 14:32</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-icon" title="查看" onclick="openDeviceDetailModal('SC-2024-001')"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon" title="编辑" onclick="openEditDeviceModal('SC-2024-001')"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-icon" title="货道" onclick="openDeviceAisleModal('SC-2024-001')"><i class="fas fa-th"></i></button>
+                                            <button class="btn-icon" title="重启" onclick="restartDevice('SC-2024-001')"><i class="fas fa-redo"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox-item"></td>
+                                    <td><span class="code">SC-2024-002</span></td>
+                                    <td>急诊科-01号柜</td>
+                                    <td>急诊科</td>
+                                    <td>36</td>
+                                    <td>980</td>
+                                    <td><span class="badge badge-green">在线</span></td>
+                                    <td>2024-01-15 14:30</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-icon" title="查看" onclick="openDeviceDetailModal('SC-2024-002')"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon" title="编辑" onclick="openEditDeviceModal('SC-2024-002')"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-icon" title="货道" onclick="openDeviceAisleModal('SC-2024-002')"><i class="fas fa-th"></i></button>
+                                            <button class="btn-icon" title="重启" onclick="restartDevice('SC-2024-002')"><i class="fas fa-redo"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox-item"></td>
+                                    <td><span class="code">SC-2024-003</span></td>
+                                    <td>ICU-01号柜</td>
+                                    <td>ICU</td>
+                                    <td>48</td>
+                                    <td>1,580</td>
+                                    <td><span class="badge badge-green">在线</span></td>
+                                    <td>2024-01-15 14:28</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-icon" title="查看" onclick="openDeviceDetailModal('SC-2024-003')"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon" title="编辑" onclick="openEditDeviceModal('SC-2024-003')"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-icon" title="货道" onclick="openDeviceAisleModal('SC-2024-003')"><i class="fas fa-th"></i></button>
+                                            <button class="btn-icon" title="重启" onclick="restartDevice('SC-2024-003')"><i class="fas fa-redo"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox-item"></td>
+                                    <td><span class="code">SC-2024-004</span></td>
+                                    <td>药房-02号柜</td>
+                                    <td>药房</td>
+                                    <td>64</td>
+                                    <td>2,150</td>
+                                    <td><span class="badge badge-red">离线</span></td>
+                                    <td>2024-01-14 22:15</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-icon" title="查看" onclick="openDeviceDetailModal('SC-2024-004')"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon" title="编辑" onclick="openEditDeviceModal('SC-2024-004')"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-icon" title="货道" onclick="openDeviceAisleModal('SC-2024-004')"><i class="fas fa-th"></i></button>
+                                            <button class="btn-icon primary" title="重启" onclick="restartDevice('SC-2024-004')"><i class="fas fa-redo"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><input type="checkbox" class="checkbox-item"></td>
+                                    <td><span class="code">SC-2024-005</span></td>
+                                    <td>手术室-02号柜</td>
+                                    <td>手术室</td>
+                                    <td>48</td>
+                                    <td>890</td>
+                                    <td><span class="badge badge-orange">告警</span></td>
+                                    <td>2024-01-15 14:25</td>
+                                    <td>
+                                        <div class="table-actions">
+                                            <button class="btn-icon" title="查看" onclick="openDeviceDetailModal('SC-2024-005')"><i class="fas fa-eye"></i></button>
+                                            <button class="btn-icon" title="编辑" onclick="openEditDeviceModal('SC-2024-005')"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-icon" title="货道" onclick="openDeviceAisleModal('SC-2024-005')"><i class="fas fa-th"></i></button>
+                                            <button class="btn-icon" title="重启" onclick="restartDevice('SC-2024-005')"><i class="fas fa-redo"></i></button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="pagination">
+                        <div class="pagination-info">
+                            共 <strong>128</strong> 条记录，每页
+                            <select class="page-size">
+                                <option value="10">10</option>
+                                <option value="20" selected>20</option>
+                                <option value="50">50</option>
+                            </select>
+                            条
+                        </div>
+                        <div class="pagination-nav">
+                            <button class="btn btn-text" disabled>
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                            <button class="btn btn-primary active">1</button>
+                            <button class="btn btn-text">2</button>
+                            <button class="btn btn-text">3</button>
+                            <span class="pagination-ellipsis">...</span>
+                            <button class="btn btn-text">7</button>
+                            <button class="btn btn-text">
+                                <i class="fas fa-chevron-right"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 新增设备弹窗 -->
+    <div class="modal" id="addDeviceModal">
+        <div class="modal-overlay" onclick="closeModal('addDeviceModal')"></div>
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">
+                    <i class="fas fa-plus-circle"></i>
+                    新增设备
+                </h3>
+                <button class="modal-close" onclick="closeModal('addDeviceModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-grid">
+                    <div class="form-group">
+                        <label class="form-label required">设备名称</label>
+                        <input type="text" class="form-input" placeholder="请输入设备名称">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">设备编号</label>
+                        <input type="text" class="form-input" placeholder="系统自动生成">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">所属院区</label>
+                        <select class="form-select">
+                            <option value="">请选择</option>
+                            <option value="main">主院区</option>
+                            <option value="east">东院区</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">所属科室</label>
+                        <select class="form-select">
+                            <option value="">请选择</option>
+                            <option value="surgery">手术室</option>
+                            <option value="emergency">急诊科</option>
+                            <option value="icu">ICU</option>
+                            <option value="pharmacy">药房</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label required">货道数量</label>
+                        <input type="number" class="form-input" placeholder="请输入货道数量">
+                    </div>
+                    <div class="form-group">
+                        <label class="form-label">设备型号</label>
+                        <input type="text" class="form-input" placeholder="请输入设备型号">
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">安装位置</label>
+                        <input type="text" class="form-input" placeholder="请输入详细安装位置">
+                    </div>
+                    <div class="form-group full-width">
+                        <label class="form-label">备注</label>
+                        <textarea class="form-textarea" rows="3" placeholder="请输入备注信息"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeModal('addDeviceModal')">取消</button>
+                <button class="btn btn-primary">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 菜单切换
+        document.querySelectorAll('.nav-item.has-submenu > .nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const parent = link.parentElement;
+                parent.classList.toggle('active');
+                const submenu = parent.querySelector('.submenu');
+                submenu.classList.toggle('show');
+            });
+        });
+
+        // 侧边栏折叠
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        });
+
+        // 弹窗控制
+        function openModal(modalId) {
+            document.getElementById(modalId).classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        // 全选
+        document.querySelector('.checkbox-all').addEventListener('change', function() {
+            document.querySelectorAll('.checkbox-item').forEach(cb => {
+                cb.checked = this.checked;
+            });
+        });
+    
+    // 用户下拉菜单交互
+    const userDropdown = document.getElementById('userDropdown');
+    const userMenu = document.getElementById('userMenu');
+
+    if (userDropdown && userMenu) {
+        userDropdown.addEventListener('click', (e) => {
+            e.stopPropagation();
+            userDropdown.classList.toggle('active');
+            userMenu.classList.toggle('show');
+        });
+
+        document.addEventListener('click', (e) => {
+            if (!userDropdown.contains(e.target)) {
+                userDropdown.classList.remove('active');
+                userMenu.classList.remove('show');
+            }
+        });
+
+        const logoutBtn = document.querySelector('.user-menu-item.logout');
+        if (logoutBtn) {
+            logoutBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (typeof Modal !== 'undefined') {
+                    Modal.confirm('确定要退出登录吗？', () => {
+                        window.location.href = logoutBtn.getAttribute('href');
+                    });
+                } else {
+                    if (confirm('确定要退出登录吗？')) {
+                        window.location.href = logoutBtn.getAttribute('href');
+                    }
+                }
+            });
+        }
+    }
+</script>
+    <script src="../js/app.js"></script>
+    <script src="../js/page-enhance.js"></script>
+</body>
+</html>

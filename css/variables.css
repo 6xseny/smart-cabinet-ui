@@ -1,0 +1,126 @@
+/* ============================================
+   智能柜后台管理系统 - CSS变量定义
+   科技霓虹风格设计系统
+   ============================================ */
+
+:root {
+    /* ---------- 主色调 - 霓虹科技蓝 ---------- */
+    --primary-50: #e0f7ff;
+    --primary-100: #b3ecff;
+    --primary-200: #80dfff;
+    --primary-300: #4dd2ff;
+    --primary-400: #26c9ff;
+    --primary-500: #00bfff;
+    --primary-600: #00a8e6;
+    --primary-700: #008fcc;
+    --primary-800: #0077b3;
+    --primary-900: #005f99;
+
+    /* ---------- 强调色 - 霓虹紫/粉 ---------- */
+    --accent-400: #d946ef;
+    --accent-500: #c026d3;
+    --accent-600: #a21caf;
+    --neon-pink: #ff00ff;
+    --neon-cyan: #00ffff;
+    --neon-purple: #bf00ff;
+    --neon-blue: #0080ff;
+    --neon-green: #00ff88;
+
+    /* ---------- 功能色 ---------- */
+    --success: #00ff88;
+    --warning: #ffcc00;
+    --error: #ff3366;
+    --info: #00bfff;
+
+    /* ---------- 背景色 - 深色科技主题 ---------- */
+    --bg-primary: #050a14;
+    --bg-secondary: #0a1429;
+    --bg-tertiary: #111d3d;
+    --bg-card: rgba(17, 29, 61, 0.7);
+    --bg-hover: rgba(0, 191, 255, 0.1);
+    --bg-elevated: #0d1a33;
+
+    /* ---------- 文字色 ---------- */
+    --text-primary: #ffffff;
+    --text-secondary: #a0b4d9;
+    --text-tertiary: #6b7a9c;
+
+    /* ---------- 边框色 ---------- */
+    --border-color: rgba(0, 191, 255, 0.2);
+    --border-light: rgba(0, 191, 255, 0.1);
+    --border-primary: rgba(0, 191, 255, 0.3);
+    --border-secondary: rgba(0, 191, 255, 0.15);
+    --border-glow: rgba(0, 191, 255, 0.6);
+
+    /* ---------- 阴影 - 霓虹发光效果 ---------- */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.5);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.6), 0 2px 4px -2px rgba(0, 0, 0, 0.6);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.7), 0 4px 6px -4px rgba(0, 0, 0, 0.7);
+    --shadow-glow: 0 0 10px rgba(0, 191, 255, 0.5), 0 0 20px rgba(0, 191, 255, 0.3);
+    --shadow-glow-lg: 0 0 20px rgba(0, 191, 255, 0.6), 0 0 40px rgba(0, 191, 255, 0.4);
+    --shadow-glow-pink: 0 0 10px rgba(255, 0, 255, 0.5), 0 0 20px rgba(255, 0, 255, 0.3);
+    --shadow-glow-purple: 0 0 10px rgba(191, 0, 255, 0.5), 0 0 20px rgba(191, 0, 255, 0.3);
+
+    /* ---------- 圆角 ---------- */
+    --radius-sm: 4px;
+    --radius-md: 8px;
+    --radius-lg: 12px;
+    --radius-xl: 16px;
+    --radius-full: 9999px;
+
+    /* ---------- 间距 ---------- */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-5: 20px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-10: 40px;
+    --space-12: 48px;
+    
+    /* 兼容旧命名 */
+    --space-xs: 4px;
+    --space-sm: 8px;
+    --space-md: 16px;
+    --space-lg: 24px;
+    --space-xl: 32px;
+    --space-2xl: 48px;
+    --space-3xl: 64px;
+
+    /* ---------- 字体大小 ---------- */
+    --text-xs: 0.75rem;
+    --text-sm: 0.875rem;
+    --text-base: 1rem;
+    --text-lg: 1.125rem;
+    --text-xl: 1.25rem;
+    --text-2xl: 1.5rem;
+    --text-3xl: 1.875rem;
+
+    /* ---------- 字重 ---------- */
+    --font-normal: 400;
+    --font-medium: 500;
+    --font-semibold: 600;
+    --font-bold: 700;
+
+    /* ---------- 过渡 ---------- */
+    --transition-fast: 150ms ease;
+    --transition-base: 250ms ease;
+    --transition-slow: 350ms ease;
+    --duration-fast: 150ms;
+    --duration-normal: 250ms;
+    --ease-out: cubic-bezier(0.4, 0, 0.2, 1);
+
+    /* ---------- Z-index ---------- */
+    --z-dropdown: 100;
+    --z-sticky: 200;
+    --z-modal: 1000;
+    --z-tooltip: 1100;
+
+    /* ---------- 渐变 - 霓虹效果 ---------- */
+    --gradient-primary: linear-gradient(135deg, var(--primary-500), var(--neon-cyan));
+    --gradient-glow: linear-gradient(135deg, rgba(0, 191, 255, 0.3), rgba(191, 0, 255, 0.2));
+    --gradient-card: linear-gradient(180deg, rgba(17, 29, 61, 0.9), rgba(5, 10, 20, 0.95));
+    --gradient-neon: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple), var(--neon-pink));
+    --gradient-border: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+}
