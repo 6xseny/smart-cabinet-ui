@@ -3726,6 +3726,29 @@ const FormValidator = {
     }
 };
 
+// ==================== 侧边栏切换 ====================
+function initSidebarToggle() {
+    const menuToggle = document.querySelector('.menu-toggle');
+    const sidebar = document.querySelector('.sidebar');
+    
+    if (menuToggle && sidebar) {
+        // 移除旧的事件监听器（如果存在）
+        const newToggle = menuToggle.cloneNode(true);
+        menuToggle.parentNode.replaceChild(newToggle, menuToggle);
+        
+        // 添加新的点击事件
+        newToggle.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            sidebar.classList.toggle('collapsed');
+            // 触发自定义事件
+            window.dispatchEvent(new CustomEvent('sidebarToggle', {
+                detail: { collapsed: sidebar.classList.contains('collapsed') }
+            }));
+        });
+    }
+}
+
 // ==================== 页面导航 ====================
 const Navigation = {
     init() {
@@ -3737,15 +3760,8 @@ const Navigation = {
             }
         });
         
-        // 移动端菜单切换
-        const menuToggle = document.querySelector('.menu-toggle');
-        const sidebar = document.querySelector('.sidebar');
-        
-        if (menuToggle && sidebar) {
-            menuToggle.addEventListener('click', () => {
-                sidebar.classList.toggle('collapsed');
-            });
-        }
+        // 初始化侧边栏切换
+        initSidebarToggle();
     }
 };
 
