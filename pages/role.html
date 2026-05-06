@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角色管理 - 智能柜后台管理系统</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+        .user-dropdown { position: relative; cursor: pointer; }
+        .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 220px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all var(--transition-fast); z-index: 1000; }
+        .user-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .user-menu-header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+        .user-menu-avatar { width: 40px; height: 40px; border-radius: 50%; }
+        .user-menu-info { flex: 1; }
+        .user-menu-name { font-weight: var(--font-medium); color: var(--text-primary); font-size: var(--text-sm); }
+        .user-menu-role { font-size: var(--text-xs); color: var(--text-secondary); margin-top: 2px; }
+        .user-menu-divider { height: 1px; background: var(--border-color); margin: var(--space-2) 0; }
+        .user-menu-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); color: var(--text-secondary); text-decoration: none; font-size: var(--text-sm); transition: all var(--transition-fast); }
+        .user-menu-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .user-menu-item i { width: 16px; text-align: center; }
+        .user-menu-item.logout { color: var(--danger-500); }
+        .user-menu-item.logout:hover { background: var(--danger-500); color: white; }
+        .user-dropdown .fa-chevron-down { transition: transform var(--transition-fast); }
+        .user-dropdown.active .fa-chevron-down { transform: rotate(180deg); }
+        .card-header .card-actions { display: flex; gap: var(--space-2); }
+
+        /* 权限树样式 */
+        .perm-tree { max-height: 320px; overflow-y: auto; padding: 8px 0; }
+        .perm-tree-node { padding: 6px 16px; }
+        .perm-tree-node.level-1 { font-weight: 600; color: var(--text-primary); padding-top: 10px; }
+        .perm-tree-node.level-2 { padding-left: 32px; color: var(--text-secondary); }
+        .perm-tree-node.level-3 { padding-left: 52px; color: var(--text-tertiary); font-size: var(--text-xs); }
+        .perm-tree-node input[type="checkbox"] { margin-right: 8px; accent-color: var(--primary-500); }
+        .perm-tree-node label { cursor: pointer; }
+</style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-cube"></i>
+                    <span>智能柜系统</span>
+                </div>
+            </div>
+                        <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <!-- 工作台已隐藏 -->
+                    <li class="nav-item">
+                        <a href="device-monitor.html" class="nav-link">
+                            <i class="fas fa-desktop"></i>
+                            <span>设备监控中心</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>基础管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="product.html">商品档案</a></li>
+                            <!-- 供应商管理已隐藏 -->
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-qrcode"></i>
+                            <span>赋码管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="coding-task.html">赋码任务</a></li>
+                            <li><a href="code-contrast.html">标签对照</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-microchip"></i>
+                            <span>智能设备管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="device.html" class="">设备管理</a></li>
+                            <li><a href="replenish.html" class="">补货管理</a></li>
+                            <!-- 盘点管理已隐藏 -->
+                            <li><a href="inventory.html">库存查询</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>系统管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="organization.html" class="">组织架构</a></li>
+                            <li><a href="user.html" class="">用户权限</a></li>
+                            <li><a href="role.html" class="active">角色管理</a></li>
+                            <li><a href="parameter.html" class="">参数管理</a></li>
+                        </ul>
+                    </li>
+                    <!-- 库存管理已隐藏，库存查询已移至智能设备管理下 -->
+                    <!-- <li class="nav-item has-submenu">
+                                            <a href="#" class="nav-link">
+                                                <i class="fas fa-warehouse"></i>
+                                                <span>库存管理</span>
+                                                <i class="fas fa-chevron-right arrow"></i>
+                                            </a>
+                                            <ul class="submenu">
+                                                <li><a href="inventory.html" class="">库存查询</a></li>
+                                                <li><a href="warning.html" class="">库存预警</a></li>
+                                            </ul>
+                                        </li> -->
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>统计分析</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="query.html" class="">业务查询</a></li>
+                            <li><a href="report.html" class="">统计报表</a></li>
+                            
+                            <li><a href="warning.html" class="">预警记录</a></li>
+                            <li><a href="trace.html" class="">条码状态跟踪</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <span>系统管理</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <span class="current">角色管理</span>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="全局搜索...">
+                    </div>
+                    <div class="header-actions">
+                        <button class="action-btn" onclick="location.href='todo-list.html'" title="待办事项">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown" style="position:relative;">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-avatar">
+                            <span class="user-name">系统管理员</span>
+                            <i class="fas fa-chevron-down"></i>
+                            <div class="user-menu" id="userMenu">
+                                <div class="user-menu-header">
+                                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-menu-avatar">
+                                    <div class="user-menu-info">
+                                        <div class="user-menu-name">系统管理员</div>
+                                        <div class="user-menu-role">超级管理员</div>
+                                    </div>
+                                </div>
+                                <div class="user-menu-divider"></div>
+                                <a href="javascript:void(0);" class="user-menu-item" onclick="openPersonalSettingsModal()">
+                                    <i class="fas fa-user-cog"></i>
+                                    <span>个人设置</span>
+                                </a>
+                                <div class="user-menu-divider"></div>
+                                <a href="../login.html" class="user-menu-item logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>退出登录</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="fas fa-user-shield"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value">8</div>
+                                <div class="stat-label">角色总数</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value">6</div>
+                                <div class="stat-label">已启用</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon red">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value">2</div>
+                                <div class="stat-label">已停用</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value">142</div>
+                                <div class="stat-label">用户总数</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header">
+                            <h3 class="card-title">
+                                <i class="fas fa-user-shield"></i>
+                                角色列表
+                            </h3>
+                            <div class="card-actions">
+                                <button class="btn btn-primary" onclick="openAddRoleModal()">
+                                    <i class="fas fa-plus"></i>
+                                    新增角色
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>角色名称</th>
+                                        <th>角色描述</th>
+                                        <th>状态</th>
+                                        <th>用户人数</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="roleTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="table-footer" id="roleTableFooter">
+                        </div>
+                    </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // 角色数据
+        const roleData = [
+            { id: 'R001', name: '超级管理员', desc: '拥有系统全部权限，可进行系统配置和用户管理', status: '启用', userCount: 3, createTime: '2024-01-01' },
+            { id: 'R002', name: 'SPD管理员', desc: 'SPD系统全院物资管理策略制定与执行', status: '启用', userCount: 5, createTime: '2024-01-15' },
+            { id: 'R003', name: '科室护士', desc: '日常领用物资、手术收费、库存查询', status: '启用', userCount: 86, createTime: '2024-02-01' },
+            { id: 'R004', name: '科室主任', desc: '科室消耗统计、收费汇总审核', status: '启用', userCount: 24, createTime: '2024-02-10' },
+            { id: 'R005', name: '系统维护员', desc: '系统部署、数据备份、运维监控', status: '启用', userCount: 4, createTime: '2024-03-01' },
+            { id: 'R006', name: '财务人员', desc: '费用结算、报表审核、账单管理', status: '启用', userCount: 12, createTime: '2024-03-15' },
+            { id: 'R007', name: '外部访客', desc: '临时访问权限，仅可查看基础信息', status: '停用', userCount: 0, createTime: '2024-04-01' },
+            { id: 'R008', name: '测试角色', desc: '测试环境专用角色', status: '停用', userCount: 0, createTime: '2024-04-20' },
+        ];
+
+        function renderRoleTable() {
+            const tbody = document.getElementById('roleTableBody');
+            tbody.innerHTML = roleData.map(r => `
+                <tr>
+                    <td><span class="code">${r.name}</span></td>
+                    <td style="color: var(--text-secondary); font-size: var(--text-xs);">${r.desc}</td>
+                    <td><span class="badge ${r.status === '启用' ? 'badge-green' : 'badge-red'}">${r.status}</span></td>
+                    <td>${r.userCount} 人</td>
+                    <td>${r.createTime}</td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="btn-icon" title="查看" onclick="viewRole('${r.id}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn-icon" title="编辑" onclick="openEditRoleModal('${r.id}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon" title="${r.status === '启用' ? '停用' : '启用'}" onclick="toggleRoleStatus('${r.id}')"><i class="fas ${r.status === '启用' ? 'fa-ban' : 'fa-check'}"></i></button>
+                            <button class="btn-icon" title="删除" onclick="deleteRole('${r.id}')" style="color: var(--danger-500);"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function openAddRoleModal() {
+            openRoleFormModal(null);
+        }
+
+        function openEditRoleModal(roleId) {
+            const role = roleData.find(r => r.id === roleId);
+            if (role) openRoleFormModal(role);
+        }
+
+        function viewRole(roleId) {
+            const role = roleData.find(r => r.id === roleId);
+            if (!role) return;
+            Modal.open({
+                title: '查看角色',
+                content: `
+                    <div style="display:grid;gap:14px;">
+                        <div>
+                            <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">角色名称</div>
+                            <div style="color:var(--text-primary);font-weight:500;">${role.name}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">角色描述</div>
+                            <div style="color:var(--text-secondary);">${role.desc}</div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div>
+                                <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">状态</div>
+                                <span class="badge ${role.status === '启用' ? 'badge-green' : 'badge-red'}">${role.status}</span>
+                            </div>
+                            <div>
+                                <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">用户人数</div>
+                                <div style="color:var(--text-primary);">${role.userCount} 人</div>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">创建时间</div>
+                            <div style="color:var(--text-secondary);">${role.createTime}</div>
+                        </div>
+                    </div>
+                `,
+                width: '480px'
+            });
+        }
+
+        function openRoleFormModal(role) {
+            const isEdit = !!role;
+            const permModules = [
+                { name: '基础管理', perms: ['商品档案-查看', '商品档案-新增', '商品档案-编辑', '商品档案-删除'] },
+                { name: '智能设备管理', perms: ['设备管理-查看', '设备管理-新增', '设备管理-编辑', '设备管理-删除', '补货管理-查看', '补货管理-新增', '补货管理-执行', '盘点管理-查看', '盘点管理-新增', '盘点管理-确认'] },
+                { name: '库存管理', perms: ['库存查询-查看', '库存预警-查看', '库存预警-处理'] },
+                { name: '系统管理', perms: ['组织架构-查看', '组织架构-编辑', '用户管理-查看', '用户管理-新增', '用户管理-编辑', '用户管理-删除', '角色管理-查看', '角色管理-新增', '角色管理-编辑', '角色管理-删除', '参数管理-查看', '参数管理-编辑'] },
+                { name: '统计分析', perms: ['业务查询-查看', '统计报表-查看', '统计报表-导出', '追溯中心-查看'] },
+                { name: '赋码管理', perms: ['赋码任务-查看', '赋码任务-新增', '赋码任务-审核', '标签对照-查看', '标签对照-编辑'] },
+            ];
+
+            const permHtml = permModules.map(m => `
+                <div class="perm-tree-node level-1">
+                    <label><input type="checkbox" data-module="${m.name}" onchange="toggleModulePerms(this)"> ${m.name}</label>
+                </div>
+                ${m.perms.map(p => `<div class="perm-tree-node level-2"><label><input type="checkbox" data-perm="${p}" class="perm-item" style="margin-left:0;"> ${p}</label></div>`).join('')}
+            `).join('');
+
+            Modal.open({
+                title: isEdit ? '编辑角色' : '新增角色',
+                content: `
+                    <div style="display:grid;gap:16px;">
+                        <div>
+                            <label class="form-label required">角色名称</label>
+                            <input type="text" class="form-input" id="roleName" value="${isEdit ? role.name : ''}" placeholder="请输入角色名称">
+                        </div>
+                        <div>
+                            <label class="form-label">角色描述</label>
+                            <textarea class="form-input" id="roleDesc" rows="3" placeholder="请输入角色描述">${isEdit ? role.desc : ''}</textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">权限分配</label>
+                            <div class="perm-tree">${permHtml}</div>
+                        </div>
+                        <div>
+                            <label class="form-label">状态</label>
+                            <div style="display:flex;gap:16px;">
+                                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                                    <input type="radio" name="roleStatus" value="启用" ${!isEdit || role.status === '启用' ? 'checked' : ''}>
+                                    <span class="badge badge-green">启用</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                                    <input type="radio" name="roleStatus" value="停用" ${isEdit && role.status === '停用' ? 'checked' : ''}>
+                                    <span class="badge badge-red">停用</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                width: '560px',
+                confirmText: isEdit ? '保存' : '创建',
+                onConfirm: () => {
+                    const name = document.getElementById('roleName').value.trim();
+                    if (!name) { App.toast.warning('请输入角色名称'); return; }
+                    const desc = document.getElementById('roleDesc').value.trim();
+                    const status = document.querySelector('input[name="roleStatus"]:checked')?.value || '启用';
+                    if (isEdit) {
+                        const idx = roleData.findIndex(r => r.id === role.id);
+                        if (idx !== -1) { roleData[idx].name = name; roleData[idx].desc = desc; roleData[idx].status = status; }
+                    } else {
+                        roleData.push({ id: 'R' + String(roleData.length + 1).padStart(3, '0'), name, desc, status, userCount: 0, createTime: new Date().toISOString().slice(0, 10) });
+                    }
+                    renderRoleTable();
+                    App.toast.success(isEdit ? '角色更新成功' : '角色创建成功');
+                }
+            });
+        }
+
+        function toggleModulePerms(cb) {
+            const node = cb.closest('.perm-tree-node');
+            const siblings = node.parentElement.querySelectorAll('.perm-item');
+            siblings.forEach(p => p.checked = cb.checked);
+        }
+
+        function toggleRoleStatus(roleId) {
+            const role = roleData.find(r => r.id === roleId);
+            if (!role) return;
+            const newStatus = role.status === '启用' ? '停用' : '启用';
+            Modal.confirm(`确定要${newStatus === '启用' ? '启用' : '停用'}角色「${role.name}」吗？`, () => {
+                role.status = newStatus;
+                renderRoleTable();
+                App.toast.success(`角色${newStatus === '启用' ? '启用' : '停用'}成功`);
+            });
+        }
+
+        function deleteRole(roleId) {
+            const role = roleData.find(r => r.id === roleId);
+            if (!role) return;
+            Modal.confirm(`确定要删除角色「${role.name}」吗？删除后不可恢复。`, () => {
+                const idx = roleData.findIndex(r => r.id === roleId);
+                if (idx !== -1) roleData.splice(idx, 1);
+                renderRoleTable();
+                App.toast.success('角色删除成功');
+            });
+        }
+
+        document.querySelectorAll('.nav-item.has-submenu > .nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                link.parentElement.classList.toggle('active');
+                link.parentElement.querySelector('.submenu').classList.toggle('show');
+            });
+        });
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        });
+        const userDropdown = document.getElementById('userDropdown');
+        const userMenu = document.getElementById('userMenu');
+        if (userDropdown && userMenu) {
+            userDropdown.addEventListener('click', (e) => { e.stopPropagation(); userDropdown.classList.toggle('active'); userMenu.classList.toggle('show'); });
+            document.addEventListener('click', (e) => { if (!userDropdown.contains(e.target)) { userDropdown.classList.remove('active'); userMenu.classList.remove('show'); } });
+        }
+        renderRoleTable();
+    </script>
+    <script src="../js/app.js"></script>
+    <script src="../js/page-enhance.js"></script>
+</body>
+</html>

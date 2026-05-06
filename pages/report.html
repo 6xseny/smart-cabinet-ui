@@ -437,20 +437,16 @@
                     <span>智能柜系统</span>
                 </div>
             </div>
-            <nav class="sidebar-nav">
+                        <nav class="sidebar-nav">
                 <ul class="nav-list">
-                    <li class="nav-item">
-                        <a href="../index.html" class="nav-link">
-                            <i class="fas fa-home"></i>
-                            <span>工作台</span>
-                        </a>
-                    </li>
+                    <!-- 工作台已隐藏 -->
                     <li class="nav-item">
                         <a href="device-monitor.html" class="nav-link">
                             <i class="fas fa-desktop"></i>
                             <span>设备监控中心</span>
                         </a>
                     </li>
+                    
                     <li class="nav-item has-submenu">
                         <a href="#" class="nav-link">
                             <i class="fas fa-box"></i>
@@ -459,7 +455,7 @@
                         </a>
                         <ul class="submenu">
                             <li><a href="product.html">商品档案</a></li>
-                            <li><a href="supplier.html">供应商管理</a></li>
+                            <!-- 供应商管理已隐藏 -->
                         </ul>
                     </li>
                     <li class="nav-item has-submenu">
@@ -475,39 +471,54 @@
                     </li>
                     <li class="nav-item has-submenu">
                         <a href="#" class="nav-link">
+                            <i class="fas fa-microchip"></i>
+                            <span>智能设备管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="device.html" class="">设备管理</a></li>
+                            <li><a href="replenish.html" class="">补货管理</a></li>
+                            <!-- 盘点管理已隐藏 -->
+                            <li><a href="inventory.html">库存查询</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
                             <i class="fas fa-cog"></i>
                             <span>系统管理</span>
                             <i class="fas fa-chevron-right arrow"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="organization.html">组织架构</a></li>
-                            <li><a href="device.html">设备管理</a></li>
-                            <li><a href="user.html">用户权限</a></li>
+                            <li><a href="organization.html" class="">组织架构</a></li>
+                            <li><a href="user.html" class="">用户权限</a></li>
+                            <li><a href="role.html" class="">角色管理</a></li>
+                            <li><a href="parameter.html" class="">参数管理</a></li>
                         </ul>
                     </li>
+                    <!-- 库存管理已隐藏，库存查询已移至智能设备管理下 -->
+                    <!-- <li class="nav-item has-submenu">
+                                            <a href="#" class="nav-link">
+                                                <i class="fas fa-warehouse"></i>
+                                                <span>库存管理</span>
+                                                <i class="fas fa-chevron-right arrow"></i>
+                                            </a>
+                                            <ul class="submenu">
+                                                <li><a href="inventory.html" class="">库存查询</a></li>
+                                                <li><a href="warning.html" class="">库存预警</a></li>
+                                            </ul>
+                                        </li> -->
                     <li class="nav-item has-submenu">
                         <a href="#" class="nav-link">
-                            <i class="fas fa-warehouse"></i>
-                            <span>库存管理</span>
+                            <i class="fas fa-chart-bar"></i>
+                            <span>统计分析</span>
                             <i class="fas fa-chevron-right arrow"></i>
                         </a>
                         <ul class="submenu">
-                            <li><a href="inventory.html">库存查询</a></li>
-                            <li><a href="warning.html">库存预警</a></li>
-                            <li><a href="replenish.html">补货管理</a></li>
-                            <li><a href="stocktaking.html">盘点管理</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item has-submenu active">
-                        <a href="#" class="nav-link">
-                            <i class="fas fa-chart-bar"></i>
-                            <span>查询统计</span>
-                            <i class="fas fa-chevron-right arrow"></i>
-                        </a>
-                        <ul class="submenu show">
-                            <li><a href="query.html">业务查询</a></li>
+                            <li><a href="query.html" class="">业务查询</a></li>
                             <li><a href="report.html" class="active">统计报表</a></li>
-                            <li><a href="trace.html">追溯中心</a></li>
+                            
+                            <li><a href="warning.html" class="">预警记录</a></li>
+                            <li><a href="trace.html" class="">条码状态跟踪</a></li>
                         </ul>
                     </li>
                 </ul>
@@ -573,568 +584,374 @@
 
                 <!-- Tab 导航 -->
                 <div class="report-tabs">
-                    <button class="tab-btn active" data-tab="inventory">
-                        <i class="fas fa-warehouse"></i>
-                        库存汇总
-                    </button>
-                    <button class="tab-btn" data-tab="inout">
+                    <button class="tab-btn active" data-tab="purchase-sale">
                         <i class="fas fa-exchange-alt"></i>
-                        出入库明细
+                        进销存查询
                     </button>
-                    <button class="tab-btn" data-tab="usage">
-                        <i class="fas fa-shopping-cart"></i>
-                        领用统计
+                    <button class="tab-btn" data-tab="access-record">
+                        <i class="fas fa-history"></i>
+                        存取记录查询
                     </button>
-                    <button class="tab-btn" data-tab="turnover">
-                        <i class="fas fa-chart-line"></i>
-                        库存周转
+                    <button class="tab-btn" data-tab="door-record">
+                        <i class="fas fa-door-open"></i>
+                        智能柜开关门记录查询
                     </button>
                 </div>
 
                 <!-- 库存汇总报表 -->
-                <div class="tab-content active" id="inventory">
+                <!-- 进销存查询 -->
+                <div class="tab-content active" id="purchase-sale">
                     <div class="stat-row">
                         <div class="stat-card-mini">
+                            <div class="stat-value-mini">1,256</div>
+                            <div class="stat-label-mini">本月入库笔数</div>
+                        </div>
+                        <div class="stat-card-mini">
+                            <div class="stat-value-mini">893</div>
+                            <div class="stat-label-mini">本月出库笔数</div>
+                        </div>
+                        <div class="stat-card-mini">
                             <div class="stat-value-mini">12,580</div>
-                            <div class="stat-label-mini">总库存量</div>
+                            <div class="stat-label-mini">当前库存量</div>
                         </div>
                         <div class="stat-card-mini">
                             <div class="stat-value-mini">¥2.4M</div>
-                            <div class="stat-label-mini">库存金额</div>
-                        </div>
-                        <div class="stat-card-mini">
-                            <div class="stat-value-mini">86</div>
-                            <div class="stat-label-mini">库存品类</div>
-                        </div>
-                        <div class="stat-card-mini">
-                            <div class="stat-value-mini">23</div>
-                            <div class="stat-label-mini">预警商品</div>
+                            <div class="stat-label-mini">库存总金额</div>
                         </div>
                     </div>
-
-                    <div class="chart-wrapper">
-                        <div class="chart-title">
-                            <i class="fas fa-chart-line"></i>
-                            各科室库存趋势
+                    <div class="filter-row" style="padding: 16px 20px 0;">
+                        <div class="filter-item">
+                            <label>商品名称</label>
+                            <input type="text" class="form-input" placeholder="请输入商品名称/编码">
                         </div>
-                        <div class="chart-visual">
-                            <div class="line-chart-container">
-                                <svg class="line-chart-svg" viewBox="0 0 600 180" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="lineGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" style="stop-color:#00bfff;stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:#00ff88;stop-opacity:1" />
-                                        </linearGradient>
-                                        <linearGradient id="areaGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#00bfff;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#00bfff;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <!-- 网格线 -->
-                                    <line class="line-chart-grid" x1="0" y1="45" x2="600" y2="45"/>
-                                    <line class="line-chart-grid" x1="0" y1="90" x2="600" y2="90"/>
-                                    <line class="line-chart-grid" x1="0" y1="135" x2="600" y2="135"/>
-                                    <!-- 面积 -->
-                                    <path class="line-chart-area" d="M 0,135 L 100,45 L 200,90 L 300,60 L 400,75 L 500,105 L 600,120 L 600,180 L 0,180 Z"/>
-                                    <!-- 曲线 -->
-                                    <path class="line-chart-line" d="M 0,135 C 50,90 75,45 100,45 C 150,45 175,120 200,90 C 250,60 275,75 300,60 C 350,45 375,90 400,75 C 450,60 475,120 500,105 C 550,135 575,105 600,120"/>
-                                    <!-- 数据点 -->
-                                    <circle class="line-chart-point" cx="0" cy="135"/>
-                                    <circle class="line-chart-point" cx="100" cy="45"/>
-                                    <circle class="line-chart-point" cx="200" cy="90"/>
-                                    <circle class="line-chart-point" cx="300" cy="60"/>
-                                    <circle class="line-chart-point" cx="400" cy="75"/>
-                                    <circle class="line-chart-point" cx="500" cy="105"/>
-                                    <circle class="line-chart-point" cx="600" cy="120"/>
-                                    <!-- 数值标签 -->
-                                    <text class="line-chart-value" x="0" y="125">3245</text>
-                                    <text class="line-chart-value" x="100" y="35">2680</text>
-                                    <text class="line-chart-value" x="200" y="80">1890</text>
-                                    <text class="line-chart-value" x="300" y="50">2450</text>
-                                    <text class="line-chart-value" x="400" y="65">1560</text>
-                                    <text class="line-chart-value" x="500" y="95">1420</text>
-                                    <text class="line-chart-value" x="600" y="110">1355</text>
-                                    <!-- X轴标签 -->
-                                    <text class="line-chart-label" x="0" y="195">手术室</text>
-                                    <text class="line-chart-label" x="100" y="195">急诊科</text>
-                                    <text class="line-chart-label" x="200" y="195">住院部</text>
-                                    <text class="line-chart-label" x="300" y="195">ICU</text>
-                                    <text class="line-chart-label" x="400" y="195">药库</text>
-                                    <text class="line-chart-label" x="500" y="195">门诊</text>
-                                    <text class="line-chart-label" x="600" y="195">其他</text>
-                                </svg>
+                        <div class="filter-item">
+                            <label>科室</label>
+                            <select class="form-select">
+                                <option value="">全部</option>
+                                <option>手术室</option>
+                                <option>急诊科</option>
+                                <option>住院部</option>
+                                <option>药库</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>时间范围</label>
+                            <div class="date-range">
+                                <input type="date" class="form-input">
+                                <span>至</span>
+                                <input type="date" class="form-input">
                             </div>
                         </div>
                     </div>
-
-                    <div class="data-table-wrapper">
+                    <div class="data-table-wrapper" style="margin-top:16px;">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>科室</th>
-                                    <th>库存数量</th>
-                                    <th>库存金额</th>
-                                    <th>品类数</th>
-                                    <th>占比</th>
-                                    <th>较上月</th>
+                                    <th>商品编码</th>
+                                    <th>商品名称</th>
+                                    <th>规格型号</th>
+                                    <th>期初库存</th>
+                                    <th>本期入库</th>
+                                    <th>本期出库</th>
+                                    <th>期末库存</th>
+                                    <th>所属科室</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><i class="fas fa-procedures" style="color: var(--primary-400); margin-right: 8px;"></i>手术室</td>
-                                    <td>3,245</td>
-                                    <td>¥685,000</td>
-                                    <td>28</td>
-                                    <td>25.8%</td>
-                                    <td class="trend-up"><i class="fas fa-arrow-up"></i> 5.2%</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-heartbeat" style="color: var(--primary-400); margin-right: 8px;"></i>急诊科</td>
-                                    <td>2,680</td>
-                                    <td>¥452,000</td>
-                                    <td>22</td>
-                                    <td>21.3%</td>
-                                    <td class="trend-up"><i class="fas fa-arrow-up"></i> 3.8%</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-bed" style="color: var(--primary-400); margin-right: 8px;"></i>住院部</td>
-                                    <td>1,890</td>
-                                    <td>¥328,000</td>
-                                    <td>18</td>
-                                    <td>15.0%</td>
-                                    <td class="trend-down"><i class="fas fa-arrow-down"></i> 2.1%</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-hospital" style="color: var(--primary-400); margin-right: 8px;"></i>ICU</td>
-                                    <td>2,450</td>
-                                    <td>¥512,000</td>
-                                    <td>15</td>
-                                    <td>19.5%</td>
-                                    <td class="trend-up"><i class="fas fa-arrow-up"></i> 8.5%</td>
-                                </tr>
-                                <tr>
-                                    <td><i class="fas fa-warehouse" style="color: var(--primary-400); margin-right: 8px;"></i>药库</td>
-                                    <td>1,560</td>
-                                    <td>¥285,000</td>
-                                    <td>32</td>
-                                    <td>12.4%</td>
-                                    <td class="trend-up"><i class="fas fa-arrow-up"></i> 1.2%</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 出入库明细报表 -->
-                <div class="tab-content" id="inout">
-                    <div class="stat-row">
-                        <div class="stat-card-mini">
-                            <div class="stat-value-mini">3,247</div>
-                            <div class="stat-label-mini">本月入库</div>
-                        </div>
-                        <div class="stat-card-mini">
-                            <div class="stat-value-mini">2,856</div>
-                            <div class="stat-label-mini">本月出库</div>
-                        </div>
-                        <div class="stat-card-mini">
-                            <div class="stat-value-mini">391</div>
-                            <div class="stat-label-mini">库存净增</div>
-                        </div>
-                        <div class="stat-card-mini">
-                            <div class="stat-value-mini">¥1.2M</div>
-                            <div class="stat-label-mini">流转金额</div>
-                        </div>
-                    </div>
-
-                    <div class="chart-wrapper">
-                        <div class="chart-title">
-                            <i class="fas fa-chart-line"></i>
-                            近7天出入库趋势
-                        </div>
-                        <div class="chart-visual">
-                            <div class="line-chart-container multi-line-chart">
-                                <svg class="line-chart-svg" viewBox="0 0 600 180" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="lineGradientIn" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" style="stop-color:#00ff88;stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:#00cc6a;stop-opacity:1" />
-                                        </linearGradient>
-                                        <linearGradient id="areaGradientIn" x1="0%" y1="0%" x2="0%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#00ff88;stop-opacity:0.3" />
-                                            <stop offset="100%" style="stop-color:#00ff88;stop-opacity:0.05" />
-                                        </linearGradient>
-                                        <linearGradient id="lineGradientOut" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" style="stop-color:#ffaa00;stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:#ff8800;stop-opacity:1" />
-                                        </linearGradient>
-                                        <linearGradient id="areaGradientOut" x1="0%" y1="0%" x2="0%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#ffaa00;stop-opacity:0.3" />
-                                            <stop offset="100%" style="stop-color:#ffaa00;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <!-- 网格线 -->
-                                    <line class="line-chart-grid" x1="0" y1="45" x2="600" y2="45"/>
-                                    <line class="line-chart-grid" x1="0" y1="90" x2="600" y2="90"/>
-                                    <line class="line-chart-grid" x1="0" y1="135" x2="600" y2="135"/>
-                                    <!-- 入库面积 -->
-                                    <path class="line-chart-area in" d="M 0,108 L 100,54 L 200,126 L 300,36 L 400,72 L 500,144 L 600,162 L 600,180 L 0,180 Z"/>
-                                    <!-- 出库面积 -->
-                                    <path class="line-chart-area out" d="M 0,135 L 100,81 L 200,108 L 300,54 L 400,90 L 500,126 L 600,153 L 600,180 L 0,180 Z"/>
-                                    <!-- 入库曲线 -->
-                                    <path class="line-chart-line in" d="M 0,108 C 50,81 75,54 100,54 C 150,90 175,144 200,126 C 250,90 275,54 300,36 C 350,54 375,90 400,72 C 450,108 475,162 500,144 C 550,153 575,171 600,162"/>
-                                    <!-- 出库曲线 -->
-                                    <path class="line-chart-line out" d="M 0,135 C 50,108 75,81 100,81 C 150,95 175,126 200,108 C 250,81 275,72 300,54 C 350,72 375,108 400,90 C 450,108 475,144 500,126 C 550,140 575,162 600,153"/>
-                                    <!-- 入库数据点 -->
-                                    <circle class="line-chart-point in" cx="0" cy="108"/>
-                                    <circle class="line-chart-point in" cx="100" cy="54"/>
-                                    <circle class="line-chart-point in" cx="200" cy="126"/>
-                                    <circle class="line-chart-point in" cx="300" cy="36"/>
-                                    <circle class="line-chart-point in" cx="400" cy="72"/>
-                                    <circle class="line-chart-point in" cx="500" cy="144"/>
-                                    <circle class="line-chart-point in" cx="600" cy="162"/>
-                                    <!-- 出库数据点 -->
-                                    <circle class="line-chart-point out" cx="0" cy="135"/>
-                                    <circle class="line-chart-point out" cx="100" cy="81"/>
-                                    <circle class="line-chart-point out" cx="200" cy="108"/>
-                                    <circle class="line-chart-point out" cx="300" cy="54"/>
-                                    <circle class="line-chart-point out" cx="400" cy="90"/>
-                                    <circle class="line-chart-point out" cx="500" cy="126"/>
-                                    <circle class="line-chart-point out" cx="600" cy="153"/>
-                                    <!-- X轴标签 -->
-                                    <text class="line-chart-label" x="0" y="195">周一</text>
-                                    <text class="line-chart-label" x="100" y="195">周二</text>
-                                    <text class="line-chart-label" x="200" y="195">周三</text>
-                                    <text class="line-chart-label" x="300" y="195">周四</text>
-                                    <text class="line-chart-label" x="400" y="195">周五</text>
-                                    <text class="line-chart-label" x="500" y="195">周六</text>
-                                    <text class="line-chart-label" x="600" y="195">周日</text>
-                                </svg>
-                            </div>
-                            <div class="chart-legend">
-                                <div class="legend-item">
-                                    <div class="legend-dot in"></div>
-                                    <span>入库</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-dot out"></div>
-                                    <span>出库</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>日期</th>
-                                    <th>入库数量</th>
-                                    <th>入库金额</th>
-                                    <th>出库数量</th>
-                                    <th>出库金额</th>
-                                    <th>库存结余</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td>2024-01-15</td>
-                                    <td class="trend-up">+156</td>
-                                    <td>¥32,500</td>
-                                    <td class="trend-down">-128</td>
-                                    <td>¥28,600</td>
-                                    <td>12,580</td>
-                                </tr>
-                                <tr>
-                                    <td>2024-01-14</td>
-                                    <td class="trend-up">+142</td>
-                                    <td>¥28,900</td>
-                                    <td class="trend-down">-95</td>
-                                    <td>¥21,300</td>
-                                    <td>12,552</td>
-                                </tr>
-                                <tr>
-                                    <td>2024-01-13</td>
-                                    <td class="trend-up">+189</td>
-                                    <td>¥45,200</td>
-                                    <td class="trend-down">-167</td>
-                                    <td>¥38,500</td>
-                                    <td>12,505</td>
-                                </tr>
-                                <tr>
-                                    <td>2024-01-12</td>
-                                    <td class="trend-up">+98</td>
-                                    <td>¥18,600</td>
-                                    <td class="trend-down">-203</td>
-                                    <td>¥46,800</td>
-                                    <td>12,483</td>
-                                </tr>
-                                <tr>
-                                    <td>2024-01-11</td>
-                                    <td class="trend-up">+234</td>
-                                    <td>¥52,100</td>
-                                    <td class="trend-down">-156</td>
-                                    <td>¥35,200</td>
-                                    <td>12,588</td>
-                                </tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- 领用统计报表 -->
-                <div class="tab-content" id="usage">
-                    <div class="stat-row">
-                        <div class="stat-card-mini">
-                            <div class="stat-value-mini">2,856</div>
-                            <div class="stat-label-mini">本月领用</div>
-                        </div>
-                        <div class="stat-card-mini">
-                            <div class="stat-value-mini">¥486K</div>
-                            <div class="stat-label-mini">领用金额</div>
-                        </div>
-                        <div class="stat-card-mini">
-                            <div class="stat-value-mini">156</div>
-                            <div class="stat-label-mini">领用人次</div>
-                        </div>
-                        <div class="stat-card-mini">
-                            <div class="stat-value-mini">18.3</div>
-                            <div class="stat-label-mini">人均领用</div>
-                        </div>
-                    </div>
-
-                    <div class="chart-wrapper">
-                        <div class="chart-title">
-                            <i class="fas fa-chart-line"></i>
-                            各科室领用趋势
-                        </div>
-                        <div class="chart-visual">
-                            <div class="line-chart-container">
-                                <svg class="line-chart-svg" viewBox="0 0 500 180" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="lineGradientUsage" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" style="stop-color:#00bfff;stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:#00ff88;stop-opacity:1" />
-                                        </linearGradient>
-                                        <linearGradient id="areaGradientUsage" x1="0%" y1="0%" x2="0%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#00bfff;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#00bfff;stop-opacity:0.05" />
-                                        </linearGradient>
-                                    </defs>
-                                    <!-- 网格线 -->
-                                    <line class="line-chart-grid" x1="0" y1="45" x2="500" y2="45"/>
-                                    <line class="line-chart-grid" x1="0" y1="90" x2="500" y2="90"/>
-                                    <line class="line-chart-grid" x1="0" y1="135" x2="500" y2="135"/>
-                                    <!-- 面积 -->
-                                    <path class="line-chart-area" d="M 0,36 L 125,99 L 250,126 L 375,72 L 500,144 L 500,180 L 0,180 Z"/>
-                                    <!-- 曲线 -->
-                                    <path class="line-chart-line" d="M 0,36 C 62,54 93,90 125,99 C 187,108 218,135 250,126 C 312,99 343,81 375,72 C 437,108 468,126 500,144"/>
-                                    <!-- 数据点 -->
-                                    <circle class="line-chart-point" cx="0" cy="36"/>
-                                    <circle class="line-chart-point" cx="125" cy="99"/>
-                                    <circle class="line-chart-point" cx="250" cy="126"/>
-                                    <circle class="line-chart-point" cx="375" cy="72"/>
-                                    <circle class="line-chart-point" cx="500" cy="144"/>
-                                    <!-- 数值标签 -->
-                                    <text class="line-chart-value" x="0" y="26">856</text>
-                                    <text class="line-chart-value" x="125" y="89">623</text>
-                                    <text class="line-chart-value" x="250" y="116">412</text>
-                                    <text class="line-chart-value" x="375" y="62">534</text>
-                                    <text class="line-chart-value" x="500" y="134">289</text>
-                                    <!-- X轴标签 -->
-                                    <text class="line-chart-label" x="0" y="195">手术室</text>
-                                    <text class="line-chart-label" x="125" y="195">急诊科</text>
-                                    <text class="line-chart-label" x="250" y="195">住院部</text>
-                                    <text class="line-chart-label" x="375" y="195">ICU</text>
-                                    <text class="line-chart-label" x="500" y="195">门诊</text>
-                                </svg>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="data-table-wrapper">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th>科室</th>
-                                    <th>领用次数</th>
-                                    <th>领用数量</th>
-                                    <th>领用金额</th>
-                                    <th>占比</th>
-                                    <th>较上月</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><i class="fas fa-procedures" style="color: var(--primary-400); margin-right: 8px;"></i>手术室</td>
-                                    <td>68</td>
+                                    <td><span class="code">SP20240001</span></td>
+                                    <td>一次性使用无菌注射器</td>
+                                    <td>5ml/支</td>
+                                    <td>500</td>
+                                    <td>1000</td>
                                     <td>856</td>
-                                    <td>¥156,800</td>
-                                    <td>32.3%</td>
-                                    <td class="trend-up"><i class="fas fa-arrow-up"></i> 12.5%</td>
+                                    <td>644</td>
+                                    <td>手术室</td>
                                 </tr>
                                 <tr>
-                                    <td><i class="fas fa-heartbeat" style="color: var(--primary-400); margin-right: 8px;"></i>急诊科</td>
-                                    <td>52</td>
-                                    <td>623</td>
-                                    <td>¥98,500</td>
-                                    <td>20.3%</td>
-                                    <td class="trend-up"><i class="fas fa-arrow-up"></i> 8.2%</td>
+                                    <td><span class="code">SP20240002</span></td>
+                                    <td>头孢呋辛钠注射液</td>
+                                    <td>1.5g/瓶</td>
+                                    <td>200</td>
+                                    <td>400</td>
+                                    <td>320</td>
+                                    <td>280</td>
+                                    <td>急诊科</td>
                                 </tr>
                                 <tr>
-                                    <td><i class="fas fa-hospital" style="color: var(--primary-400); margin-right: 8px;"></i>ICU</td>
-                                    <td>45</td>
-                                    <td>534</td>
-                                    <td>¥112,300</td>
-                                    <td>23.1%</td>
-                                    <td class="trend-up"><i class="fas fa-arrow-up"></i> 15.8%</td>
+                                    <td><span class="code">SP20240003</span></td>
+                                    <td>医用纱布块</td>
+                                    <td>10cm×10cm</td>
+                                    <td>800</td>
+                                    <td>500</td>
+                                    <td>620</td>
+                                    <td>680</td>
+                                    <td>住院部</td>
                                 </tr>
                                 <tr>
-                                    <td><i class="fas fa-bed" style="color: var(--primary-400); margin-right: 8px;"></i>住院部</td>
-                                    <td>38</td>
-                                    <td>412</td>
-                                    <td>¥68,900</td>
-                                    <td>14.2%</td>
-                                    <td class="trend-down"><i class="fas fa-arrow-down"></i> 3.5%</td>
+                                    <td><span class="code">SP20240004</span></td>
+                                    <td>氯化钠注射液</td>
+                                    <td>500ml/瓶</td>
+                                    <td>300</td>
+                                    <td>600</td>
+                                    <td>512</td>
+                                    <td>388</td>
+                                    <td>药库</td>
                                 </tr>
                                 <tr>
-                                    <td><i class="fas fa-stethoscope" style="color: var(--primary-400); margin-right: 8px;"></i>门诊</td>
-                                    <td>28</td>
-                                    <td>289</td>
-                                    <td>¥42,600</td>
-                                    <td>8.8%</td>
-                                    <td class="trend-up"><i class="fas fa-arrow-up"></i> 2.1%</td>
+                                    <td><span class="code">SP20240005</span></td>
+                                    <td>手术刀片</td>
+                                    <td>11#</td>
+                                    <td>150</td>
+                                    <td>200</td>
+                                    <td>180</td>
+                                    <td>170</td>
+                                    <td>手术室</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
                 </div>
 
-                <!-- 库存周转报表 -->
-                <div class="tab-content" id="turnover">
+                <!-- 存取记录查询 -->
+                <div class="tab-content" id="access-record">
                     <div class="stat-row">
                         <div class="stat-card-mini">
-                            <div class="stat-value-mini">12.5</div>
-                            <div class="stat-label-mini">平均周转天数</div>
+                            <div class="stat-value-mini">2,345</div>
+                            <div class="stat-label-mini">今日存取次数</div>
                         </div>
                         <div class="stat-card-mini">
-                            <div class="stat-value-mini">29.2</div>
-                            <div class="stat-label-mini">周转次数/年</div>
+                            <div class="stat-value-mini">1,128</div>
+                            <div class="stat-label-mini">存入次数</div>
                         </div>
                         <div class="stat-card-mini">
-                            <div class="stat-value-mini">86.5%</div>
-                            <div class="stat-label-mini">库存准确率</div>
+                            <div class="stat-value-mini">1,217</div>
+                            <div class="stat-label-mini">取出次数</div>
                         </div>
                         <div class="stat-card-mini">
-                            <div class="stat-value-mini">4.2%</div>
-                            <div class="stat-label-mini">滞销率</div>
+                            <div class="stat-value-mini">3</div>
+                            <div class="stat-label-mini">异常记录</div>
                         </div>
                     </div>
-
-                    <div class="chart-wrapper">
-                        <div class="chart-title">
-                            <i class="fas fa-chart-area"></i>
-                            近6个月库存周转率趋势
+                    <div class="filter-row" style="padding: 16px 20px 0;">
+                        <div class="filter-item">
+                            <label>操作类型</label>
+                            <select class="form-select">
+                                <option value="">全部</option>
+                                <option>存入</option>
+                                <option>取出</option>
+                            </select>
                         </div>
-                        <div class="chart-visual">
-                            <div class="line-chart-container">
-                                <svg class="line-chart-svg" viewBox="0 0 500 180" preserveAspectRatio="none">
-                                    <defs>
-                                        <linearGradient id="lineGradientTurnover" x1="0%" y1="0%" x2="100%" y2="0%">
-                                            <stop offset="0%" style="stop-color:#00bfff;stop-opacity:1" />
-                                            <stop offset="50%" style="stop-color:#00ff88;stop-opacity:1" />
-                                            <stop offset="100%" style="stop-color:#00bfff;stop-opacity:1" />
-                                        </linearGradient>
-                                        <linearGradient id="areaGradientTurnover" x1="0%" y1="0%" x2="0%" y2="100%">
-                                            <stop offset="0%" style="stop-color:#00bfff;stop-opacity:0.4" />
-                                            <stop offset="100%" style="stop-color:#00ff88;stop-opacity:0.1" />
-                                        </linearGradient>
-                                    </defs>
-                                    <!-- 网格线 -->
-                                    <line class="line-chart-grid" x1="0" y1="45" x2="500" y2="45"/>
-                                    <line class="line-chart-grid" x1="0" y1="90" x2="500" y2="90"/>
-                                    <line class="line-chart-grid" x1="0" y1="135" x2="500" y2="135"/>
-                                    <!-- 面积 -->
-                                    <path class="line-chart-area" d="M 0,63 L 100,54 L 200,72 L 300,36 L 400,45 L 500,27 L 500,180 L 0,180 Z"/>
-                                    <!-- 曲线 -->
-                                    <path class="line-chart-line" d="M 0,63 C 50,58 75,54 100,54 C 150,63 175,81 200,72 C 250,54 275,45 300,36 C 350,40 375,54 400,45 C 450,36 475,36 500,27"/>
-                                    <!-- 数据点 -->
-                                    <circle class="line-chart-point" cx="0" cy="63"/>
-                                    <circle class="line-chart-point" cx="100" cy="54"/>
-                                    <circle class="line-chart-point" cx="200" cy="72"/>
-                                    <circle class="line-chart-point" cx="300" cy="36"/>
-                                    <circle class="line-chart-point" cx="400" cy="45"/>
-                                    <circle class="line-chart-point" cx="500" cy="27"/>
-                                    <!-- 数值标签 -->
-                                    <text class="line-chart-value" x="0" y="53">26.5</text>
-                                    <text class="line-chart-value" x="100" y="44">28.2</text>
-                                    <text class="line-chart-value" x="200" y="62">24.8</text>
-                                    <text class="line-chart-value" x="300" y="26">31.5</text>
-                                    <text class="line-chart-value" x="400" y="35">29.8</text>
-                                    <text class="line-chart-value" x="500" y="17">33.2</text>
-                                    <!-- X轴标签 -->
-                                    <text class="line-chart-label" x="0" y="195">8月</text>
-                                    <text class="line-chart-label" x="100" y="195">9月</text>
-                                    <text class="line-chart-label" x="200" y="195">10月</text>
-                                    <text class="line-chart-label" x="300" y="195">11月</text>
-                                    <text class="line-chart-label" x="400" y="195">12月</text>
-                                    <text class="line-chart-label" x="500" y="195">1月</text>
-                                </svg>
+                        <div class="filter-item">
+                            <label>设备编号</label>
+                            <input type="text" class="form-input" placeholder="请输入设备编号">
+                        </div>
+                        <div class="filter-item">
+                            <label>操作人员</label>
+                            <input type="text" class="form-input" placeholder="请输入人员姓名">
+                        </div>
+                        <div class="filter-item">
+                            <label>时间范围</label>
+                            <div class="date-range">
+                                <input type="date" class="form-input">
+                                <span>至</span>
+                                <input type="date" class="form-input">
                             </div>
                         </div>
                     </div>
-
-                    <div class="data-table-wrapper">
+                    <div class="data-table-wrapper" style="margin-top:16px;">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>商品类别</th>
-                                    <th>库存数量</th>
-                                    <th>月均出库</th>
-                                    <th>周转天数</th>
-                                    <th>周转率</th>
+                                    <th>记录编号</th>
+                                    <th>设备编号</th>
+                                    <th>设备名称</th>
+                                    <th>操作类型</th>
+                                    <th>商品名称</th>
+                                    <th>数量</th>
+                                    <th>操作人员</th>
+                                    <th>操作时间</th>
                                     <th>状态</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><i class="fas fa-pills" style="color: var(--primary-400); margin-right: 8px;"></i>药品类</td>
-                                    <td>5,230</td>
-                                    <td>1,568</td>
-                                    <td>10.0天</td>
-                                    <td>36.5次/年</td>
-                                    <td><span class="badge badge-success">良好</span></td>
+                                    <td><span class="code">AC2024001</span></td>
+                                    <td>SC-2024-001</td>
+                                    <td>手术室-01号柜</td>
+                                    <td><span class="badge badge-green">存入</span></td>
+                                    <td>一次性无菌手套</td>
+                                    <td>50</td>
+                                    <td>张护士</td>
+                                    <td>2024-01-15 08:30</td>
+                                    <td><span class="badge badge-success">正常</span></td>
                                 </tr>
                                 <tr>
-                                    <td><i class="fas fa-syringe" style="color: var(--primary-400); margin-right: 8px;"></i>耗材类</td>
-                                    <td>3,450</td>
-                                    <td>856</td>
-                                    <td>12.1天</td>
-                                    <td>29.8次/年</td>
-                                    <td><span class="badge badge-success">良好</span></td>
+                                    <td><span class="code">AC2024002</span></td>
+                                    <td>SC-2024-002</td>
+                                    <td>急诊科-02号柜</td>
+                                    <td><span class="badge badge-blue">取出</span></td>
+                                    <td>医用纱布块</td>
+                                    <td>10</td>
+                                    <td>李医生</td>
+                                    <td>2024-01-15 09:15</td>
+                                    <td><span class="badge badge-success">正常</span></td>
                                 </tr>
                                 <tr>
-                                    <td><i class="fas fa-heartbeat" style="color: var(--primary-400); margin-right: 8px;"></i>器械类</td>
-                                    <td>2,180</td>
-                                    <td>342</td>
-                                    <td>19.1天</td>
-                                    <td>18.8次/年</td>
-                                    <td><span class="badge badge-warning">一般</span></td>
+                                    <td><span class="code">AC2024003</span></td>
+                                    <td>SC-2024-001</td>
+                                    <td>手术室-01号柜</td>
+                                    <td><span class="badge badge-blue">取出</span></td>
+                                    <td>头孢呋辛钠注射液</td>
+                                    <td>5</td>
+                                    <td>王护士</td>
+                                    <td>2024-01-15 10:00</td>
+                                    <td><span class="badge badge-success">正常</span></td>
                                 </tr>
                                 <tr>
-                                    <td><i class="fas fa-band-aid" style="color: var(--primary-400); margin-right: 8px;"></i>敷料类</td>
-                                    <td>1,720</td>
-                                    <td>890</td>
-                                    <td>5.8天</td>
-                                    <td>62.1次/年</td>
-                                    <td><span class="badge badge-success">优秀</span></td>
+                                    <td><span class="code">AC2024004</span></td>
+                                    <td>SC-2024-003</td>
+                                    <td>住院部-03号柜</td>
+                                    <td><span class="badge badge-green">存入</span></td>
+                                    <td>氯化钠注射液</td>
+                                    <td>20</td>
+                                    <td>陈主任</td>
+                                    <td>2024-01-15 10:45</td>
+                                    <td><span class="badge badge-warning">异常</span></td>
                                 </tr>
                                 <tr>
-                                    <td><i class="fas fa-flask" style="color: var(--primary-400); margin-right: 8px;"></i>试剂类</td>
-                                    <td>890</td>
-                                    <td>156</td>
-                                    <td>17.1天</td>
-                                    <td>21.0次/年</td>
-                                    <td><span class="badge badge-warning">一般</span></td>
+                                    <td><span class="code">AC2024005</span></td>
+                                    <td>SC-2024-002</td>
+                                    <td>急诊科-02号柜</td>
+                                    <td><span class="badge badge-blue">取出</span></td>
+                                    <td>手术刀片</td>
+                                    <td>3</td>
+                                    <td>刘医生</td>
+                                    <td>2024-01-15 11:20</td>
+                                    <td><span class="badge badge-success">正常</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- 智能柜开关门记录查询 -->
+                <div class="tab-content" id="door-record">
+                    <div class="stat-row">
+                        <div class="stat-card-mini">
+                            <div class="stat-value-mini">486</div>
+                            <div class="stat-label-mini">今日开门次数</div>
+                        </div>
+                        <div class="stat-card-mini">
+                            <div class="stat-value-mini">482</div>
+                            <div class="stat-label-mini">正常关门次数</div>
+                        </div>
+                        <div class="stat-card-mini">
+                            <div class="stat-value-mini">4</div>
+                            <div class="stat-label-mini">未关门次数</div>
+                        </div>
+                        <div class="stat-card-mini">
+                            <div class="stat-value-mini">99.2%</div>
+                            <div class="stat-label-mini">关门率</div>
+                        </div>
+                    </div>
+                    <div class="filter-row" style="padding: 16px 20px 0;">
+                        <div class="filter-item">
+                            <label>设备编号</label>
+                            <input type="text" class="form-input" placeholder="请输入设备编号">
+                        </div>
+                        <div class="filter-item">
+                            <label>操作结果</label>
+                            <select class="form-select">
+                                <option value="">全部</option>
+                                <option>正常关门</option>
+                                <option>未关门</option>
+                                <option>强制关门</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <label>操作人员</label>
+                            <input type="text" class="form-input" placeholder="请输入人员姓名">
+                        </div>
+                        <div class="filter-item">
+                            <label>时间范围</label>
+                            <div class="date-range">
+                                <input type="date" class="form-input">
+                                <span>至</span>
+                                <input type="date" class="form-input">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="data-table-wrapper" style="margin-top:16px;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>记录编号</th>
+                                    <th>设备编号</th>
+                                    <th>设备名称</th>
+                                    <th>开门时间</th>
+                                    <th>关门时间</th>
+                                    <th>开门时长</th>
+                                    <th>操作人员</th>
+                                    <th>开门方式</th>
+                                    <th>结果</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="code">DR2024001</span></td>
+                                    <td>SC-2024-001</td>
+                                    <td>手术室-01号柜</td>
+                                    <td>2024-01-15 08:30:12</td>
+                                    <td>2024-01-15 08:31:05</td>
+                                    <td>53秒</td>
+                                    <td>张护士</td>
+                                    <td>刷卡</td>
+                                    <td><span class="badge badge-success">正常关门</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="code">DR2024002</span></td>
+                                    <td>SC-2024-002</td>
+                                    <td>急诊科-02号柜</td>
+                                    <td>2024-01-15 09:15:33</td>
+                                    <td>2024-01-15 09:16:48</td>
+                                    <td>75秒</td>
+                                    <td>李医生</td>
+                                    <td>人脸识别</td>
+                                    <td><span class="badge badge-success">正常关门</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="code">DR2024003</span></td>
+                                    <td>SC-2024-003</td>
+                                    <td>住院部-03号柜</td>
+                                    <td>2024-01-15 10:02:18</td>
+                                    <td>—</td>
+                                    <td>超过5分钟</td>
+                                    <td>王主任</td>
+                                    <td>密码</td>
+                                    <td><span class="badge badge-warning">未关门</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="code">DR2024004</span></td>
+                                    <td>SC-2024-001</td>
+                                    <td>手术室-01号柜</td>
+                                    <td>2024-01-15 10:45:00</td>
+                                    <td>2024-01-15 10:45:42</td>
+                                    <td>42秒</td>
+                                    <td>陈护士</td>
+                                    <td>刷卡</td>
+                                    <td><span class="badge badge-success">正常关门</span></td>
+                                </tr>
+                                <tr>
+                                    <td><span class="code">DR2024005</span></td>
+                                    <td>SC-2024-002</td>
+                                    <td>急诊科-02号柜</td>
+                                    <td>2024-01-15 11:20:55</td>
+                                    <td>2024-01-15 11:21:38</td>
+                                    <td>43秒</td>
+                                    <td>刘医生</td>
+                                    <td>人脸识别</td>
+                                    <td><span class="badge badge-success">正常关门</span></td>
                                 </tr>
                             </tbody>
                         </table>
