@@ -1,0 +1,534 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>参数管理 - 智能柜后台管理系统</title>
+    <link rel="stylesheet" href="../css/variables.css">
+    <link rel="stylesheet" href="../css/base.css">
+    <link rel="stylesheet" href="../css/components.css">
+    <link rel="stylesheet" href="../css/layout.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+<style>
+        .user-dropdown { position: relative; cursor: pointer; }
+        .user-menu { position: absolute; top: calc(100% + 8px); right: 0; width: 220px; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: var(--radius-lg); box-shadow: var(--shadow-lg); opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all var(--transition-fast); z-index: 1000; }
+        .user-menu.show { opacity: 1; visibility: visible; transform: translateY(0); }
+        .user-menu-header { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-4); }
+        .user-menu-avatar { width: 40px; height: 40px; border-radius: 50%; }
+        .user-menu-info { flex: 1; }
+        .user-menu-name { font-weight: var(--font-medium); color: var(--text-primary); font-size: var(--text-sm); }
+        .user-menu-role { font-size: var(--text-xs); color: var(--text-secondary); margin-top: 2px; }
+        .user-menu-divider { height: 1px; background: var(--border-color); margin: var(--space-2) 0; }
+        .user-menu-item { display: flex; align-items: center; gap: var(--space-3); padding: var(--space-3) var(--space-4); color: var(--text-secondary); text-decoration: none; font-size: var(--text-sm); transition: all var(--transition-fast); }
+        .user-menu-item:hover { background: var(--bg-hover); color: var(--text-primary); }
+        .user-menu-item i { width: 16px; text-align: center; }
+        .user-menu-item.logout { color: var(--danger-500); }
+        .user-menu-item.logout:hover { background: var(--danger-500); color: white; }
+        .user-dropdown .fa-chevron-down { transition: transform var(--transition-fast); }
+        .user-dropdown.active .fa-chevron-down { transform: rotate(180deg); }
+        .card-header .card-actions { display: flex; gap: var(--space-2); }
+
+        /* 内联筛选器样式 */
+        .filter-inline { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+        .filter-inline select, .filter-inline input {
+            height: 36px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0 12px;
+            color: var(--text-primary);
+            font-size: var(--text-sm);
+            outline: none;
+            min-width: 100px;
+        }
+        .filter-inline select:hover, .filter-inline input:hover { border-color: var(--primary-500); }
+        .filter-inline select:focus, .filter-inline input:focus { border-color: var(--primary-500); box-shadow: 0 0 0 2px rgba(0, 191, 255, 0.2); }
+
+        /* 过滤器样式 */
+        .filter-bar { display: flex; align-items: center; gap: var(--space-4); flex-wrap: wrap; margin-bottom: var(--space-4); }
+        .filter-item { display: flex; align-items: center; gap: var(--space-2); }
+        .filter-item label { font-size: var(--text-sm); color: var(--text-secondary); white-space: nowrap; }
+        .filter-item select, .filter-item input { background: var(--bg-tertiary); border: 1px solid var(--border-color); border-radius: var(--radius-md); padding: 6px 12px; color: var(--text-primary); font-size: var(--text-sm); outline: none; }
+        .filter-item select:focus, .filter-item input:focus { border-color: var(--primary-500); }
+</style>
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="fas fa-cube"></i>
+                    <span>智能柜系统</span>
+                </div>
+            </div>
+                        <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <!-- 工作台已隐藏 -->
+                    <li class="nav-item">
+                        <a href="device-monitor.html" class="nav-link">
+                            <i class="fas fa-desktop"></i>
+                            <span>设备监控中心</span>
+                        </a>
+                    </li>
+                    
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-box"></i>
+                            <span>基础管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="product.html">商品档案</a></li>
+                            <!-- 供应商管理已隐藏 -->
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-qrcode"></i>
+                            <span>赋码管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="coding-task.html">赋码任务</a></li>
+                            <li><a href="code-contrast.html">标签对照</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-microchip"></i>
+                            <span>智能设备管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="device.html" class="">设备管理</a></li>
+                            <li><a href="replenish.html" class="">补货管理</a></li>
+                            <!-- 盘点管理已隐藏 -->
+                            <li><a href="inventory.html">库存查询</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-cog"></i>
+                            <span>系统管理</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="organization.html" class="">组织架构</a></li>
+                            <li><a href="user.html" class="">用户权限</a></li>
+                            <li><a href="role.html" class="">角色管理</a></li>
+                            <li><a href="parameter.html" class="active">参数管理</a></li>
+                        </ul>
+                    </li>
+                    <!-- 库存管理已隐藏，库存查询已移至智能设备管理下 -->
+                    <!-- <li class="nav-item has-submenu">
+                                            <a href="#" class="nav-link">
+                                                <i class="fas fa-warehouse"></i>
+                                                <span>库存管理</span>
+                                                <i class="fas fa-chevron-right arrow"></i>
+                                            </a>
+                                            <ul class="submenu">
+                                                <li><a href="inventory.html" class="">库存查询</a></li>
+                                                <li><a href="warning.html" class="">库存预警</a></li>
+                                            </ul>
+                                        </li> -->
+                    <li class="nav-item has-submenu">
+                        <a href="#" class="nav-link">
+                            <i class="fas fa-chart-bar"></i>
+                            <span>统计分析</span>
+                            <i class="fas fa-chevron-right arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li><a href="query.html" class="">业务查询</a></li>
+                            <li><a href="report.html" class="">统计报表</a></li>
+                            <li><a href="trace.html" class="">追溯中心</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <button class="menu-toggle" id="menuToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <div class="breadcrumb">
+                    <span>系统管理</span>
+                    <i class="fas fa-chevron-right"></i>
+                    <span class="current">参数管理</span>
+                </div>
+                <div class="header-right">
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="全局搜索...">
+                    </div>
+                    <div class="header-actions">
+                        <button class="action-btn" onclick="location.href='todo-list.html'" title="待办事项">
+                            <i class="fas fa-bell"></i>
+                            <span class="badge">3</span>
+                        </button>
+                        <div class="user-dropdown" id="userDropdown" style="position:relative;">
+                            <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-avatar">
+                            <span class="user-name">系统管理员</span>
+                            <i class="fas fa-chevron-down"></i>
+                            <div class="user-menu" id="userMenu">
+                                <div class="user-menu-header">
+                                    <img src="https://ui-avatars.com/api/?name=Admin&background=0D8ABC&color=fff" alt="用户" class="user-menu-avatar">
+                                    <div class="user-menu-info">
+                                        <div class="user-menu-name">系统管理员</div>
+                                        <div class="user-menu-role">超级管理员</div>
+                                    </div>
+                                </div>
+                                <div class="user-menu-divider"></div>
+                                <a href="javascript:void(0);" class="user-menu-item" onclick="openPersonalSettingsModal()">
+                                    <i class="fas fa-user-cog"></i>
+                                    <span>个人设置</span>
+                                </a>
+                                <div class="user-menu-divider"></div>
+                                <a href="../login.html" class="user-menu-item logout">
+                                    <i class="fas fa-sign-out-alt"></i>
+                                    <span>退出登录</span>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="page-content">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon blue">
+                                <i class="fas fa-sliders-h"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value">24</div>
+                                <div class="stat-label">参数总数</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon green">
+                                <i class="fas fa-check-circle"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value">20</div>
+                                <div class="stat-label">已启用</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon red">
+                                <i class="fas fa-ban"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value">4</div>
+                                <div class="stat-label">已停用</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon purple">
+                                <i class="fas fa-layer-group"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value">6</div>
+                                <div class="stat-label">参数类型</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="card">
+                        <div class="card-header" style="flex-wrap: wrap; gap: 12px;">
+                            <h3 class="card-title">
+                                <i class="fas fa-sliders-h"></i>
+                                参数列表
+                            </h3>
+                            <div class="card-actions" style="flex-wrap: wrap; gap: 12px; align-items: center;">
+                                <div class="filter-inline">
+                                    <select id="filterType" onchange="renderParamTable()">
+                                        <option value="">参数类型</option>
+                                        <option value="开关">开关</option>
+                                        <option value="数值">数值</option>
+                                        <option value="文本">文本</option>
+                                        <option value="下拉">下拉</option>
+                                    </select>
+                                    <select id="filterScene" onchange="renderParamTable()">
+                                        <option value="">业务场景</option>
+                                        <option value="系统配置">系统配置</option>
+                                        <option value="库存管理">库存管理</option>
+                                        <option value="业务流程">业务流程</option>
+                                        <option value="计费规则">计费规则</option>
+                                        <option value="设备参数">设备参数</option>
+                                    </select>
+                                    <select id="filterStatus" onchange="renderParamTable()">
+                                        <option value="">状态</option>
+                                        <option value="启用">启用</option>
+                                        <option value="停用">停用</option>
+                                    </select>
+                                    <input type="text" id="filterKeyword" placeholder="搜索参数名称/编码..." oninput="renderParamTable()" style="width: 180px;">
+                                </div>
+                                <button class="btn btn-primary" onclick="openAddParamModal()">
+                                    <i class="fas fa-plus"></i>
+                                    新增参数
+                                </button>
+                            </div>
+                        </div>
+                        <div class="table-container">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>参数编码</th>
+                                        <th>参数名称</th>
+                                        <th>参数值</th>
+                                        <th>参数类型</th>
+                                        <th>业务场景</th>
+                                        <th>状态</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="paramTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const paramData = [
+            { code: 'SYS001', name: '库存预警阈值', value: '10', type: '数值', scene: '库存管理', status: '启用', remark: '库存低于此值时触发预警（单位：件）' },
+            { code: 'SYS002', name: '补货提醒开关', value: 'true', type: '开关', scene: '库存管理', status: '启用', remark: '开启后库存不足时自动推送补货提醒' },
+            { code: 'SYS003', name: '单次领用上限', value: '50', type: '数值', scene: '业务流程', status: '启用', remark: '单次领用物资最大数量限制' },
+            { code: 'SYS004', name: '收费精度', value: '2', type: '下拉', scene: '计费规则', status: '启用', remark: '费用计算保留小数位数' },
+            { code: 'SYS005', name: '设备离线超时', value: '300', type: '数值', scene: '设备参数', status: '启用', remark: '设备离线超过此秒数标记为异常（秒）' },
+            { code: 'SYS006', name: '盘点周期', value: 'monthly', type: '下拉', scene: '业务流程', status: '启用', remark: '盘点任务自动生成周期：daily/weekly/monthly' },
+            { code: 'SYS007', name: '扫码重试次数', value: '3', type: '数值', scene: '设备参数', status: '启用', remark: '扫码识别失败后自动重试次数' },
+            { code: 'SYS008', name: '收费确认方式', value: 'auto', type: '下拉', scene: '计费规则', status: '启用', remark: 'auto=自动确认, manual=手动确认' },
+            { code: 'SYS009', name: 'HIs对接开关', value: 'false', type: '开关', scene: '系统配置', status: '停用', remark: '开启后启用HIS系统数据对接' },
+            { code: 'SYS010', name: '短信通知开关', value: 'true', type: '开关', scene: '系统配置', status: '启用', remark: '开启后向用户发送短信通知' },
+            { code: 'SYS011', name: '审计日志保留天数', value: '90', type: '数值', scene: '系统配置', status: '启用', remark: '操作日志自动清理天数' },
+            { code: 'SYS012', name: '耗材过期提醒天数', value: '30', type: '数值', scene: '库存管理', status: '启用', remark: '提前多少天提醒耗材即将过期' },
+            { code: 'SYS013', name: '设备温度阈值上限', value: '35', type: '数值', scene: '设备参数', status: '启用', remark: '超过此温度触发设备高温告警（℃）' },
+            { code: 'SYS014', name: '手术计费模式', value: 'package', type: '下拉', scene: '计费规则', status: '启用', remark: 'package=套餐计费, itemized=明细计费' },
+            { code: 'SYS015', name: '自动盘点开关', value: 'false', type: '开关', scene: '业务流程', status: '停用', remark: '开启后按盘点周期自动生成盘点任务' },
+            { code: 'SYS016', name: '数据备份频率', value: 'daily', type: '下拉', scene: '系统配置', status: '启用', remark: '数据库自动备份频率：daily/weekly' },
+            { code: 'SYS017', name: '柜门超时未关', value: '60', type: '数值', scene: '设备参数', status: '启用', remark: '柜门打开超过此秒数触发未关门告警' },
+            { code: 'SYS018', name: '二维码前缀', value: 'SPD:', type: '文本', scene: '系统配置', status: '启用', remark: '生成的二维码内容前缀标识' },
+            { code: 'SYS019', name: '低库存报警值', value: '20', type: '数值', scene: '库存管理', status: '启用', remark: '库存低于此百分比时触发低库存告警' },
+            { code: 'SYS020', name: '领用需审批', value: 'false', type: '开关', scene: '业务流程', status: '停用', remark: '开启后大额领用需上级审批' },
+            { code: 'SYS021', name: '审批金额阈值', value: '500', type: '数值', scene: '业务流程', status: '启用', remark: '超过此金额需审批（领用需审批开启时生效）' },
+            { code: 'SYS022', name: '系统名称', value: '智能柜后台管理系统', type: '文本', scene: '系统配置', status: '启用', remark: '系统标题名称' },
+            { code: 'SYS023', name: '版本号', value: '1.0.0', type: '文本', scene: '系统配置', status: '启用', remark: '当前系统版本' },
+            { code: 'SYS024', name: '演示模式开关', value: 'false', type: '开关', scene: '系统配置', status: '停用', remark: '开启后所有操作均为模拟数据' },
+        ];
+
+        function getFilteredData() {
+            const type = document.getElementById('filterType').value;
+            const scene = document.getElementById('filterScene').value;
+            const status = document.getElementById('filterStatus').value;
+            const keyword = document.getElementById('filterKeyword').value.trim().toLowerCase();
+            return paramData.filter(p => {
+                if (type && p.type !== type) return false;
+                if (scene && p.scene !== scene) return false;
+                if (status && p.status !== status) return false;
+                if (keyword && !p.name.toLowerCase().includes(keyword) && !p.code.toLowerCase().includes(keyword)) return false;
+                return true;
+            });
+        }
+
+        function renderParamTable() {
+            const data = getFilteredData();
+            const tbody = document.getElementById('paramTableBody');
+            tbody.innerHTML = data.map(p => `
+                <tr>
+                    <td><span class="code">${p.code}</span></td>
+                    <td style="font-weight:500;">${p.name}</td>
+                    <td style="color: var(--primary-400); font-family: monospace;">${p.value}</td>
+                    <td><span class="badge badge-blue">${p.type}</span></td>
+                    <td style="color: var(--text-secondary); font-size: var(--text-xs);">${p.scene}</td>
+                    <td><span class="badge ${p.status === '启用' ? 'badge-green' : 'badge-red'}">${p.status}</span></td>
+                    <td>
+                        <div class="table-actions">
+                            <button class="btn-icon" title="查看" onclick="viewParam('${p.code}')"><i class="fas fa-eye"></i></button>
+                            <button class="btn-icon" title="编辑" onclick="openEditParamModal('${p.code}')"><i class="fas fa-edit"></i></button>
+                            <button class="btn-icon" title="${p.status === '启用' ? '停用' : '启用'}" onclick="toggleParamStatus('${p.code}')"><i class="fas ${p.status === '启用' ? 'fa-ban' : 'fa-check'}"></i></button>
+                            <button class="btn-icon" title="删除" onclick="deleteParam('${p.code}')" style="color: var(--danger-500);"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function viewParam(code) {
+            const p = paramData.find(x => x.code === code);
+            if (!p) return;
+            Modal.open({
+                title: '查看参数',
+                content: `
+                    <div style="display:grid;gap:14px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div>
+                                <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">参数编码</div>
+                                <div style="color:var(--text-primary);font-family:monospace;">${p.code}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">参数类型</div>
+                                <span class="badge badge-blue">${p.type}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">参数名称</div>
+                            <div style="color:var(--text-primary);font-weight:500;">${p.name}</div>
+                        </div>
+                        <div>
+                            <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">参数值</div>
+                            <div style="color:var(--primary-400);font-family:monospace;font-size:15px;">${p.value}</div>
+                        </div>
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div>
+                                <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">业务场景</div>
+                                <div style="color:var(--text-secondary);">${p.scene}</div>
+                            </div>
+                            <div>
+                                <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">状态</div>
+                                <span class="badge ${p.status === '启用' ? 'badge-green' : 'badge-red'}">${p.status}</span>
+                            </div>
+                        </div>
+                        <div>
+                            <div style="font-size:11px;color:var(--text-tertiary);margin-bottom:4px;text-transform:uppercase;">备注说明</div>
+                            <div style="color:var(--text-secondary);font-size:var(--text-sm);">${p.remark || '-'}</div>
+                        </div>
+                    </div>
+                `,
+                width: '500px'
+            });
+        }
+
+        function openAddParamModal() { openParamFormModal(null); }
+        function openEditParamModal(code) {
+            const p = paramData.find(x => x.code === code);
+            if (p) openParamFormModal(p);
+        }
+
+        function openParamFormModal(param) {
+            const isEdit = !!param;
+            const types = ['开关', '数值', '文本', '下拉'];
+            const scenes = ['系统配置', '库存管理', '业务流程', '计费规则', '设备参数'];
+
+            Modal.open({
+                title: isEdit ? '编辑参数' : '新增参数',
+                content: `
+                    <div style="display:grid;gap:16px;">
+                        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+                            <div>
+                                <label class="form-label required">参数编码</label>
+                                <input type="text" class="form-input" id="paramCode" value="${isEdit ? param.code : ''}" placeholder="如：SYS025" ${isEdit ? 'readonly style="opacity:0.6;cursor:not-allowed;"' : ''}>
+                            </div>
+                            <div>
+                                <label class="form-label required">参数类型</label>
+                                <select class="form-input" id="paramType">
+                                    ${types.map(t => `<option value="${t}" ${isEdit && param.type === t ? 'selected' : ''}>${t}</option>`).join('')}
+                                </select>
+                            </div>
+                        </div>
+                        <div>
+                            <label class="form-label required">参数名称</label>
+                            <input type="text" class="form-input" id="paramName" value="${isEdit ? param.name : ''}" placeholder="请输入参数名称">
+                        </div>
+                        <div>
+                            <label class="form-label required">参数值</label>
+                            <input type="text" class="form-input" id="paramValue" value="${isEdit ? param.value : ''}" placeholder="请输入参数值">
+                        </div>
+                        <div>
+                            <label class="form-label">业务场景</label>
+                            <select class="form-input" id="paramScene">
+                                ${scenes.map(s => `<option value="${s}" ${isEdit && param.scene === s ? 'selected' : ''}>${s}</option>`).join('')}
+                            </select>
+                        </div>
+                        <div>
+                            <label class="form-label">备注说明</label>
+                            <textarea class="form-input" id="paramRemark" rows="2" placeholder="请输入备注说明">${isEdit ? (param.remark || '') : ''}</textarea>
+                        </div>
+                        <div>
+                            <label class="form-label">状态</label>
+                            <div style="display:flex;gap:16px;">
+                                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                                    <input type="radio" name="paramStatus" value="启用" ${!isEdit || param.status === '启用' ? 'checked' : ''}>
+                                    <span class="badge badge-green">启用</span>
+                                </label>
+                                <label style="display:flex;align-items:center;gap:6px;cursor:pointer;">
+                                    <input type="radio" name="paramStatus" value="停用" ${isEdit && param.status === '停用' ? 'checked' : ''}>
+                                    <span class="badge badge-red">停用</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                `,
+                width: '560px',
+                confirmText: isEdit ? '保存' : '创建',
+                onConfirm: () => {
+                    const code = document.getElementById('paramCode').value.trim();
+                    const name = document.getElementById('paramName').value.trim();
+                    const value = document.getElementById('paramValue').value.trim();
+                    const type = document.getElementById('paramType').value;
+                    const scene = document.getElementById('paramScene').value;
+                    const remark = document.getElementById('paramRemark').value.trim();
+                    const status = document.querySelector('input[name="paramStatus"]:checked')?.value || '启用';
+                    if (!code || !name || !value) { App.toast.warning('请填写完整必填信息'); return; }
+                    if (!isEdit && paramData.some(p => p.code === code)) { App.toast.warning('参数编码已存在'); return; }
+                    if (isEdit) {
+                        const idx = paramData.findIndex(p => p.code === param.code);
+                        if (idx !== -1) { paramData[idx] = { ...paramData[idx], name, value, type, scene, remark, status }; }
+                    } else {
+                        paramData.push({ code, name, value, type, scene, status, remark });
+                    }
+                    renderParamTable();
+                    App.toast.success(isEdit ? '参数更新成功' : '参数创建成功');
+                }
+            });
+        }
+
+        function toggleParamStatus(code) {
+            const p = paramData.find(x => x.code === code);
+            if (!p) return;
+            const newStatus = p.status === '启用' ? '停用' : '启用';
+            Modal.confirm(`确定要${newStatus === '启用' ? '启用' : '停用'}参数「${p.name}」吗？`, () => {
+                p.status = newStatus;
+                renderParamTable();
+                App.toast.success(`参数${newStatus === '启用' ? '启用' : '停用'}成功`);
+            });
+        }
+
+        function deleteParam(code) {
+            const p = paramData.find(x => x.code === code);
+            if (!p) return;
+            Modal.confirm(`确定要删除参数「${p.name}」吗？删除后不可恢复。`, () => {
+                const idx = paramData.findIndex(x => x.code === code);
+                if (idx !== -1) paramData.splice(idx, 1);
+                renderParamTable();
+                App.toast.success('参数删除成功');
+            });
+        }
+
+        document.querySelectorAll('.nav-item.has-submenu > .nav-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                link.parentElement.classList.toggle('active');
+                link.parentElement.querySelector('.submenu').classList.toggle('show');
+            });
+        });
+        document.getElementById('menuToggle').addEventListener('click', () => {
+            document.querySelector('.sidebar').classList.toggle('collapsed');
+            document.querySelector('.main-content').classList.toggle('expanded');
+        });
+        const userDropdown = document.getElementById('userDropdown');
+        const userMenu = document.getElementById('userMenu');
+        if (userDropdown && userMenu) {
+            userDropdown.addEventListener('click', (e) => { e.stopPropagation(); userDropdown.classList.toggle('active'); userMenu.classList.toggle('show'); });
+            document.addEventListener('click', (e) => { if (!userDropdown.contains(e.target)) { userDropdown.classList.remove('active'); userMenu.classList.remove('show'); } });
+        }
+        renderParamTable();
+    </script>
+    <script src="../js/app.js"></script>
+    <script src="../js/page-enhance.js"></script>
+</body>
+</html>
