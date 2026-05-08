@@ -161,6 +161,10 @@
         .filter-item.search-item .search-input-group .form-input {
             flex: 1;
         }
+
+        .stats-grid {
+            grid-template-columns: repeat(3, 1fr);
+        }
 </style>
 </head>
 <body>
@@ -203,6 +207,7 @@
                         <ul class="submenu">
                             <li><a href="coding-task.html">赋码任务</a></li>
                             <li><a href="code-contrast.html">标签对照</a></li>
+                            <li><a href="barcode.html">条码管理</a></li>
                         </ul>
                     </li>
                     <li class="nav-item has-submenu">
@@ -251,6 +256,7 @@
                         </a>
                         <ul class="submenu">
                             <li><a href="query.html" class="">业务查询</a></li>
+                            <li><a href="secondary-inbound.html" class="">二级库入库记录查询</a></li>
                             <li><a href="report.html" class="">统计报表</a></li>
                             
                             <li><a href="warning.html" class="">预警记录</a></li>
@@ -344,7 +350,7 @@
                             <i class="fas fa-check-circle"></i>
                         </div>
                         <div class="stat-info">
-                            <div class="stat-value">118</div>
+                            <div class="stat-value">122</div>
                             <div class="stat-label">在线设备</div>
                         </div>
                     </div>
@@ -355,15 +361,6 @@
                         <div class="stat-info">
                             <div class="stat-value">6</div>
                             <div class="stat-label">离线设备</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon orange">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value">4</div>
-                            <div class="stat-label">告警设备</div>
                         </div>
                     </div>
                 </div>
@@ -394,7 +391,6 @@
                                 <option value="">全部</option>
                                 <option value="online">在线</option>
                                 <option value="offline">离线</option>
-                                <option value="warning">告警</option>
                             </select>
                         </div>
                         <div class="filter-item search-item">
@@ -417,6 +413,10 @@
                             设备列表
                         </h3>
                         <div class="card-actions">
+                            <button class="btn btn-text" title="导出">
+                                <i class="fas fa-download"></i>
+                                导出
+                            </button>
                             <button class="btn btn-text" title="刷新">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
@@ -523,7 +523,7 @@
                                     <td>手术室-02号柜</td>
                                     <td>手术室</td>
                                     <td>890</td>
-                                    <td><span class="badge badge-orange">告警</span></td>
+                                    <td><span class="badge badge-green">在线</span></td>
                                     <td>2024-01-15 14:25</td>
                                     <td>
                                         <div class="table-actions">

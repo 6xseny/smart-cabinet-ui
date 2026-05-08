@@ -152,6 +152,7 @@
                         <ul class="submenu">
                             <li><a href="coding-task.html">赋码任务</a></li>
                             <li><a href="code-contrast.html">标签对照</a></li>
+                            <li><a href="barcode.html">条码管理</a></li>
                         </ul>
                     </li>
                     <li class="nav-item has-submenu">
@@ -200,6 +201,7 @@
                         </a>
                         <ul class="submenu">
                             <li><a href="query.html" class="">业务查询</a></li>
+                            <li><a href="secondary-inbound.html" class="">二级库入库记录查询</a></li>
                             <li><a href="report.html" class="">统计报表</a></li>
                             
                             <li><a href="warning.html" class="">预警记录</a></li>
@@ -266,6 +268,10 @@
                         <p class="page-desc">管理商品与UDI/追溯码的对照关系</p>
                     </div>
                     <div class="page-actions">
+                        <button class="btn btn-text" title="导出">
+                            <i class="fas fa-download"></i>
+                            导出
+                        </button>
                         <button class="btn btn-primary" onclick="openAddCodeContrastModal()">
                             <i class="fas fa-plus"></i>
                             新增对照
@@ -287,7 +293,7 @@
                                     <th>商品编码</th>
                                     <th>商品名称</th>
                                     <th>规格</th>
-                                    <th>UDI码</th>
+                                    <th>RFID码</th>
                                     <th>追溯码</th>
                                     <th>对照状态</th>
                                     <th>操作</th>
@@ -305,6 +311,7 @@
                                         <div class="table-actions">
                                             <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
                                             <button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-icon" title="打印"><i class="fas fa-print"></i></button>
                                         </div>
                                     </td>
                                 </tr>
@@ -319,6 +326,7 @@
                                         <div class="table-actions">
                                             <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
                                             <button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button>
+                                            <button class="btn-icon" title="打印"><i class="fas fa-print"></i></button>
                                         </div>
                                     </td>
                                 </tr>

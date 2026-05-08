@@ -1323,7 +1323,7 @@ const Modal = {
                         </div>
                         <div class="cabinet-item-progress">
                             <div class="cabinet-item-progress-info">
-                                <span>货道使用率</span>
+                                <span>库存使用率</span>
                                 <span>${cabinet.usage}%</span>
                             </div>
                             <div class="cabinet-item-progress-bar">
@@ -2299,9 +2299,9 @@ const Modal = {
                     </div>
                     <div class="form-row">
                         <div class="form-group">
-                            <label>UDI码 <span class="required">*</span></label>
+                            <label>RFID码 <span class="required">*</span></label>
                             <div class="scan-input-group">
-                                <input type="text" id="contrast-udi-code" placeholder="请输入或扫描UDI码">
+                                <input type="text" id="contrast-udi-code" placeholder="请输入或扫描RFID码">
                                 <button type="button" class="scan-btn" title="扫码">
                                     <i class="fas fa-qrcode"></i>
                                 </button>
@@ -2335,7 +2335,7 @@ const Modal = {
                         <i class="fas fa-info-circle"></i> 操作提示
                     </div>
                     <ul class="tips-list">
-                        <li>商品编码、UDI码、追溯码为必填项</li>
+                        <li>商品编码、RFID码、追溯码为必填项</li>
                         <li>输入商品编码后系统会自动匹配商品信息</li>
                         <li>支持扫码枪扫描条码快速录入</li>
                         <li>对照关系建立后不可修改，请仔细核对</li>
@@ -2344,6 +2344,49 @@ const Modal = {
             </div>
         `;
         
+        const saveContrast = (keepOpen = false) => {
+            const productCode = document.getElementById('contrast-product-code').value.trim();
+            const udiCode = document.getElementById('contrast-udi-code').value.trim();
+            const traceCode = document.getElementById('contrast-trace-code').value.trim();
+
+            if (!productCode) {
+                Toast.error('请输入商品编码');
+                return false;
+            }
+            if (!udiCode) {
+                Toast.error('请输入RFID码');
+                return false;
+            }
+            if (!traceCode) {
+                Toast.error('请输入追溯码');
+                return false;
+            }
+
+            Toast.success(keepOpen ? '标签对照已保存，可继续新增！' : '标签对照新增成功！');
+
+            console.log('新增标签对照:', {
+                productCode,
+                productName: document.getElementById('contrast-product-name').value,
+                udiCode,
+                traceCode,
+                batchNo: document.getElementById('contrast-batch-no').value,
+                expireDate: document.getElementById('contrast-expire-date').value
+            });
+
+            if (keepOpen) {
+                document.getElementById('contrast-product-code').value = '';
+                document.getElementById('contrast-product-name').value = '';
+                document.getElementById('contrast-product-spec').value = '';
+                document.getElementById('contrast-product-factory').value = '';
+                document.getElementById('contrast-udi-code').value = '';
+                document.getElementById('contrast-trace-code').value = '';
+                document.getElementById('contrast-batch-no').value = '';
+                document.getElementById('contrast-expire-date').value = '';
+                document.getElementById('contrast-product-code').focus();
+                return false;
+            }
+        };
+
         this.open({
             title: '<i class="fas fa-plus-circle" style="margin-right:8px;color:#00bfff;"></i>新增标签对照',
             content: content,
@@ -2363,9 +2406,9 @@ const Modal = {
                             document.getElementById('contrast-product-factory').value = '江苏恒瑞医药有限公司';
                             Toast.success('商品信息获取成功');
                         } else if (index === 1) {
-                            // UDI码扫码
+                            // RFID码扫码
                             input.value = '(01)56789012345678';
-                            Toast.success('UDI码扫描成功');
+                            Toast.success('RFID码扫描成功');
                         } else if (index === 2) {
                             // 追溯码扫码
                             input.value = '8100000567890123';
@@ -2373,39 +2416,18 @@ const Modal = {
                         }
                     });
                 });
+
+                const footer = document.querySelector('.modal-overlay .modal-footer');
+                const confirmBtn = footer?.querySelector('.modal-btn-confirm');
+                if (footer && confirmBtn && !footer.querySelector('.modal-btn-save-add')) {
+                    const saveAddBtn = document.createElement('button');
+                    saveAddBtn.className = 'btn btn-secondary modal-btn-save-add';
+                    saveAddBtn.textContent = '保存后新增';
+                    saveAddBtn.onclick = () => saveContrast(true);
+                    footer.insertBefore(saveAddBtn, confirmBtn);
+                }
             },
-            onConfirm: () => {
-                // 表单验证
-                const productCode = document.getElementById('contrast-product-code').value.trim();
-                const udiCode = document.getElementById('contrast-udi-code').value.trim();
-                const traceCode = document.getElementById('contrast-trace-code').value.trim();
-                
-                if (!productCode) {
-                    Toast.error('请输入商品编码');
-                    return false;
-                }
-                if (!udiCode) {
-                    Toast.error('请输入UDI码');
-                    return false;
-                }
-                if (!traceCode) {
-                    Toast.error('请输入追溯码');
-                    return false;
-                }
-                
-                // 模拟保存成功
-                Toast.success('标签对照新增成功！');
-                
-                // 这里可以添加实际的保存逻辑，如 AJAX 请求
-                console.log('新增标签对照:', {
-                    productCode,
-                    productName: document.getElementById('contrast-product-name').value,
-                    udiCode,
-                    traceCode,
-                    batchNo: document.getElementById('contrast-batch-no').value,
-                    expireDate: document.getElementById('contrast-expire-date').value
-                });
-            },
+            onConfirm: () => saveContrast(false),
             onCancel: () => {},
             confirmText: '保存',
             cancelText: '取消'
@@ -3110,8 +3132,7 @@ const Modal = {
                 mac: '00:1A:2B:3C:4D:5E',
                 status: 'online',
                 lastOnline: '2024-01-15 14:32',
-                aisleCount: 48,
-                usedAisle: 42,
+                stockCount: 1250,
                 temperature: '22°C',
                 humidity: '45%',
                 firmware: 'v2.1.5',
@@ -3280,8 +3301,8 @@ const Modal = {
                     </div>
                     <div class="metrics-row">
                         <div class="metric-card">
-                            <div class="metric-value">${data.usedAisle}/${data.aisleCount}</div>
-                            <div class="metric-label">货道使用</div>
+                            <div class="metric-value">${data.stockCount || 1250}</div>
+                            <div class="metric-label">库存总量</div>
                         </div>
                         <div class="metric-card">
                             <div class="metric-value">${data.temperature}</div>
@@ -3447,125 +3468,6 @@ const Modal = {
         });
     },
 
-    // 设备管理 - 货道管理
-    deviceAisle(deviceId) {
-        const content = `
-            <style>
-                .device-aisle-modal .aisle-grid {
-                    display: grid;
-                    grid-template-columns: repeat(6, 1fr);
-                    gap: 8px;
-                    margin-bottom: 16px;
-                }
-                .device-aisle-modal .aisle-item {
-                    aspect-ratio: 1;
-                    display: flex;
-                    flex-direction: column;
-                    align-items: center;
-                    justify-content: center;
-                    border-radius: 6px;
-                    font-size: 11px;
-                    cursor: pointer;
-                    transition: all 0.2s;
-                    border: 1px solid transparent;
-                }
-                .device-aisle-modal .aisle-item.empty {
-                    background: rgba(100,100,100,0.1);
-                    color: #8892a0;
-                    border-color: rgba(100,100,100,0.2);
-                }
-                .device-aisle-modal .aisle-item.used {
-                    background: rgba(0,191,255,0.15);
-                    color: #00bfff;
-                    border-color: rgba(0,191,255,0.3);
-                }
-                .device-aisle-modal .aisle-item.warning {
-                    background: rgba(255,167,38,0.15);
-                    color: #ffa726;
-                    border-color: rgba(255,167,38,0.3);
-                }
-                .device-aisle-modal .aisle-item:hover {
-                    transform: scale(1.05);
-                    box-shadow: 0 2px 8px rgba(0,0,0,0.3);
-                }
-                .device-aisle-modal .aisle-no {
-                    font-weight: 600;
-                    font-size: 12px;
-                }
-                .device-aisle-modal .aisle-status {
-                    font-size: 10px;
-                    opacity: 0.8;
-                }
-                .device-aisle-modal .legend {
-                    display: flex;
-                    justify-content: center;
-                    gap: 24px;
-                    padding-top: 12px;
-                    border-top: 1px solid rgba(0,191,255,0.1);
-                }
-                .device-aisle-modal .legend-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 6px;
-                    font-size: 12px;
-                    color: #8892a0;
-                }
-                .device-aisle-modal .legend-dot {
-                    width: 10px;
-                    height: 10px;
-                    border-radius: 2px;
-                }
-                .device-aisle-modal .legend-dot.empty {
-                    background: rgba(100,100,100,0.3);
-                }
-                .device-aisle-modal .legend-dot.used {
-                    background: rgba(0,191,255,0.5);
-                }
-                .device-aisle-modal .legend-dot.warning {
-                    background: rgba(255,167,38,0.5);
-                }
-            </style>
-            
-            <div class="device-aisle-modal">
-                <div class="aisle-grid">
-                    ${Array.from({length: 48}, (_, i) => {
-                        const no = i + 1;
-                        const status = i < 6 ? 'warning' : i < 42 ? 'used' : 'empty';
-                        const statusText = status === 'warning' ? '预警' : status === 'used' ? '使用中' : '空闲';
-                        return `
-                            <div class="aisle-item ${status}" onclick="Toast.info('货道${no}: ${statusText}')">
-                                <span class="aisle-no">${no}</span>
-                                <span class="aisle-status">${statusText}</span>
-                            </div>
-                        `;
-                    }).join('')}
-                </div>
-                <div class="legend">
-                    <div class="legend-item">
-                        <div class="legend-dot empty"></div>
-                        <span>空闲</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-dot used"></div>
-                        <span>使用中</span>
-                    </div>
-                    <div class="legend-item">
-                        <div class="legend-dot warning"></div>
-                        <span>库存预警</span>
-                    </div>
-                </div>
-            </div>
-        `;
-        
-        this.open({
-            title: '<i class="fas fa-th" style="margin-right:8px;color:#00bfff;"></i>货道管理',
-            content: content,
-            width: '600px',
-            showCancel: false,
-            confirmText: '关闭',
-            onConfirm: () => true
-        });
-    }
 };
 
 // ==================== 加载状态 ====================
@@ -3726,42 +3628,38 @@ const FormValidator = {
     }
 };
 
-// ==================== 侧边栏切换 ====================
-function initSidebarToggle() {
-    const menuToggle = document.querySelector('.menu-toggle');
-    const sidebar = document.querySelector('.sidebar');
-    
-    if (menuToggle && sidebar) {
-        // 移除旧的事件监听器（如果存在）
-        const newToggle = menuToggle.cloneNode(true);
-        menuToggle.parentNode.replaceChild(newToggle, menuToggle);
-        
-        // 添加新的点击事件
-        newToggle.addEventListener('click', function(e) {
-            e.preventDefault();
-            e.stopPropagation();
-            sidebar.classList.toggle('collapsed');
-            // 触发自定义事件
-            window.dispatchEvent(new CustomEvent('sidebarToggle', {
-                detail: { collapsed: sidebar.classList.contains('collapsed') }
-            }));
-        });
-    }
-}
-
 // ==================== 页面导航 ====================
 const Navigation = {
     init() {
         // 侧边栏菜单激活状态
         const currentPage = window.location.pathname.split('/').pop() || 'index.html';
-        document.querySelectorAll('.sidebar-menu a').forEach(link => {
-            if (link.getAttribute('href').includes(currentPage)) {
-                link.parentElement.classList.add('active');
+        document.querySelectorAll('.sidebar-nav a').forEach(link => {
+            if (link.getAttribute('href') && link.getAttribute('href').includes(currentPage)) {
+                // 高亮当前页面链接
+                link.classList.add('active');
+                
+                // 展开所属的子菜单
+                const submenu = link.closest('.submenu');
+                if (submenu) {
+                    submenu.classList.add('show');
+                    // 展开父级菜单
+                    const parentItem = submenu.closest('.has-submenu');
+                    if (parentItem) {
+                        parentItem.classList.add('active');
+                    }
+                }
             }
         });
         
-        // 初始化侧边栏切换
-        initSidebarToggle();
+        // 移动端菜单切换
+        const menuToggle = document.querySelector('.menu-toggle');
+        const sidebar = document.querySelector('.sidebar');
+        
+        if (menuToggle && sidebar) {
+            menuToggle.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed');
+            });
+        }
     }
 };
 
@@ -3969,15 +3867,6 @@ window.openDeviceDetailModal = function(deviceId) {
 window.openEditDeviceModal = function(deviceId) {
     if (typeof Modal !== 'undefined') {
         Modal.editDevice(deviceId);
-    } else {
-        console.error('Modal not loaded');
-    }
-};
-
-// 设备管理 - 货道管理
-window.openDeviceAisleModal = function(deviceId) {
-    if (typeof Modal !== 'undefined') {
-        Modal.deviceAisle(deviceId);
     } else {
         console.error('Modal not loaded');
     }

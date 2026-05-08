@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>盘点管理 - 智能柜后台管理系统</title>
+    <title>条码管理 - 智能柜后台管理系统</title>
     <link rel="stylesheet" href="../css/variables.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/components.css">
@@ -110,6 +110,34 @@
 
         .user-dropdown.active .fa-chevron-down {
             transform: rotate(180deg);
+        }
+
+        .barcode-summary-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: var(--space-5);
+            margin-bottom: var(--space-6);
+        }
+        .barcode-status-select {
+            min-width: 120px;
+            height: 34px;
+            padding: 0 10px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            outline: none;
+        }
+        .barcode-modal-row {
+            display: grid;
+            grid-template-columns: 120px 1fr;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .barcode-modal-row label {
+            color: var(--text-secondary);
+            font-size: var(--text-sm);
         }
 </style>
 </head>
@@ -218,9 +246,9 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="breadcrumb">
-                    <span>库存管理</span>
+                    <span>赋码管理</span>
                     <i class="fas fa-chevron-right"></i>
-                    <span class="current">盘点管理</span>
+                    <span class="current">条码管理</span>
                 </div>
                 <div class="header-right">
                     <div class="search-box">
@@ -264,52 +292,31 @@
             <div class="page-content">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">盘点管理</h1>
-                        <p class="page-desc">创建盘点任务，执行库存盘点，处理盘点差异</p>
-                    </div>
-                    <div class="page-actions">
-                        <button class="btn btn-primary" onclick="openAddStocktakingTaskModal()">
-                            <i class="fas fa-plus"></i>
-                            新建盘点任务
-                        </button>
+                        <h1 class="page-title">条码管理</h1>
+                        <p class="page-desc">集中管理所有标签条码，支持更新条码状态并记录更新时间和更新人</p>
                     </div>
                 </div>
 
-                <div class="stats-grid">
+                <div class="barcode-summary-grid">
                     <div class="stat-card">
-                        <div class="stat-icon blue">
-                            <i class="fas fa-clipboard-check"></i>
-                        </div>
+                        <div class="stat-icon blue"><i class="fas fa-barcode"></i></div>
                         <div class="stat-info">
-                            <div class="stat-value">3</div>
-                            <div class="stat-label">待盘点</div>
+                            <div class="stat-value" id="barcodeTotal">0</div>
+                            <div class="stat-label">条码总数</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon orange">
-                            <i class="fas fa-spinner"></i>
-                        </div>
+                        <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
                         <div class="stat-info">
-                            <div class="stat-value">2</div>
-                            <div class="stat-label">盘点中</div>
+                            <div class="stat-value" id="barcodeEnabled">0</div>
+                            <div class="stat-label">启用条码</div>
                         </div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon green">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
+                        <div class="stat-icon orange"><i class="fas fa-pause-circle"></i></div>
                         <div class="stat-info">
-                            <div class="stat-value">15</div>
-                            <div class="stat-label">已完成</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon red">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value">1</div>
-                            <div class="stat-label">有差异</div>
+                            <div class="stat-value" id="barcodeDisabled">0</div>
+                            <div class="stat-label">停用条码</div>
                         </div>
                     </div>
                 </div>
@@ -318,60 +325,76 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-list"></i>
-                            盘点任务列表
+                            条码列表
                         </h3>
+                        <div class="card-actions">
+                            <button class="btn btn-text" title="导出">
+                                <i class="fas fa-download"></i>
+                                导出
+                            </button>
+                            <button class="btn btn-text" title="刷新" onclick="renderBarcodeTable()">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                        </div>
                     </div>
                     <div class="table-container">
                         <table class="data-table">
                             <thead>
                                 <tr>
-                                    <th>任务编号</th>
-                                    <th>任务名称</th>
-                                    <th>盘点范围</th>
-                                    <th>计划时间</th>
-                                    <th>盘点人</th>
-                                    <th>状态</th>
-                                    <th>差异</th>
-                                    <th>操作</th>
+                                    <th>条码编号</th>
+                                    <th>RFID码</th>
+                                    <th>关联商品</th>
+                                    <th>规格</th>
+                                    <th>当前状态</th>
+                                    <th>更新时间</th>
+                                    <th>更新人</th>
+                                    <th width="160">操作</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                <tr>
-                                    <td><span class="code">STK2024001</span></td>
-                                    <td>手术室月度盘点</td>
-                                    <td>手术室-主柜</td>
-                                    <td>2024-01-20</td>
-                                    <td>张护士</td>
-                                    <td><span class="badge badge-blue">待盘点</span></td>
-                                    <td>-</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="开始"><i class="fas fa-play"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><span class="code">STK2024002</span></td>
-                                    <td>急诊科季度盘点</td>
-                                    <td>急诊科-全部</td>
-                                    <td>2024-01-18</td>
-                                    <td>李医生</td>
-                                    <td><span class="badge badge-orange">盘点中</span></td>
-                                    <td>-</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="继续"><i class="fas fa-forward"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
+                            <tbody id="barcodeTableBody"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
         </main>
+    </div>
+
+    <div class="modal-overlay" id="barcodeStatusModal" style="display:none;">
+        <div class="modal-container" style="width: 480px;">
+            <div class="modal-header">
+                <h3 class="modal-title"><i class="fas fa-edit"></i> 更新条码状态</h3>
+                <button class="modal-close" onclick="closeBarcodeStatusModal()"><i class="fas fa-times"></i></button>
+            </div>
+            <div class="modal-body">
+                <input type="hidden" id="editingBarcodeId">
+                <div class="barcode-modal-row">
+                    <label>条码编号</label>
+                    <div id="modalBarcodeNo" class="code"></div>
+                </div>
+                <div class="barcode-modal-row">
+                    <label>RFID码</label>
+                    <div id="modalRfidCode" class="code"></div>
+                </div>
+                <div class="barcode-modal-row">
+                    <label>条码状态</label>
+                    <select id="modalBarcodeStatus" class="barcode-status-select">
+                        <option value="enabled">启用</option>
+                        <option value="disabled">停用</option>
+                    </select>
+                </div>
+                <div class="barcode-modal-row">
+                    <label>更新人</label>
+                    <input type="text" id="modalUpdatedBy" class="form-input" value="系统管理员">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-ghost" onclick="closeBarcodeStatusModal()">取消</button>
+                <button class="btn btn-primary" onclick="saveBarcodeStatus()">
+                    <i class="fas fa-check"></i>
+                    保存
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -425,6 +448,79 @@
         }
     }
 </script>
+
+    <script>
+        const barcodeData = [
+            { id: 'BC20240508001', rfid: 'E20034150200108000000130', product: '一次性使用无菌注射器', spec: '5ml 带针', status: 'enabled', updatedAt: '2026-05-08 09:30', updatedBy: '张敏' },
+            { id: 'BC20240508002', rfid: 'E20034150200108000000129', product: '头孢呋辛钠注射液', spec: '0.75g/瓶', status: 'enabled', updatedAt: '2026-05-08 09:28', updatedBy: '李华' },
+            { id: 'BC20240508003', rfid: 'E20034150200108000000128', product: '医用纱布块', spec: '8×10cm 灭菌', status: 'disabled', updatedAt: '2026-05-08 09:12', updatedBy: '王芳' },
+            { id: 'BC20240508004', rfid: 'E20034150200108000000127', product: '手术刀片', spec: '10# 碳钢', status: 'enabled', updatedAt: '2026-05-08 08:45', updatedBy: '赵磊' }
+        ];
+
+        const statusMap = {
+            enabled: { text: '启用', badge: 'badge-green' },
+            disabled: { text: '停用', badge: 'badge-orange' }
+        };
+
+        function renderBarcodeTable() {
+            const tbody = document.getElementById('barcodeTableBody');
+            tbody.innerHTML = barcodeData.map(item => {
+                const status = statusMap[item.status];
+                return `
+                    <tr>
+                        <td><span class="code">${item.id}</span></td>
+                        <td><span class="code">${item.rfid}</span></td>
+                        <td>${item.product}</td>
+                        <td>${item.spec}</td>
+                        <td><span class="badge ${status.badge}">${status.text}</span></td>
+                        <td>${item.updatedAt}</td>
+                        <td>${item.updatedBy}</td>
+                        <td>
+                            <div class="table-actions">
+                                <button class="btn-icon" title="更新状态" onclick="openBarcodeStatusModal('${item.id}')"><i class="fas fa-edit"></i></button>
+                                <button class="btn-icon" title="打印"><i class="fas fa-print"></i></button>
+                            </div>
+                        </td>
+                    </tr>`;
+            }).join('');
+            document.getElementById('barcodeTotal').textContent = barcodeData.length;
+            document.getElementById('barcodeEnabled').textContent = barcodeData.filter(i => i.status === 'enabled').length;
+            document.getElementById('barcodeDisabled').textContent = barcodeData.filter(i => i.status === 'disabled').length;
+        }
+
+        function openBarcodeStatusModal(id) {
+            const item = barcodeData.find(i => i.id === id);
+            if (!item) return;
+            document.getElementById('editingBarcodeId').value = item.id;
+            document.getElementById('modalBarcodeNo').textContent = item.id;
+            document.getElementById('modalRfidCode').textContent = item.rfid;
+            document.getElementById('modalBarcodeStatus').value = item.status;
+            document.getElementById('modalUpdatedBy').value = item.updatedBy || '系统管理员';
+            document.getElementById('barcodeStatusModal').style.display = 'flex';
+        }
+
+        function closeBarcodeStatusModal() {
+            document.getElementById('barcodeStatusModal').style.display = 'none';
+        }
+
+        function saveBarcodeStatus() {
+            const id = document.getElementById('editingBarcodeId').value;
+            const item = barcodeData.find(i => i.id === id);
+            if (!item) return;
+            item.status = document.getElementById('modalBarcodeStatus').value;
+            item.updatedBy = document.getElementById('modalUpdatedBy').value.trim() || '系统管理员';
+            item.updatedAt = new Date().toLocaleString('zh-CN', { hour12: false }).replace(/\//g, '-');
+            renderBarcodeTable();
+            closeBarcodeStatusModal();
+            if (window.App && App.toast) {
+                App.toast.success('条码状态已更新');
+            } else {
+                alert('条码状态已更新');
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', renderBarcodeTable);
+    </script>
     <script src="../js/app.js"></script>
     <script src="../js/page-enhance.js"></script>
 </body>

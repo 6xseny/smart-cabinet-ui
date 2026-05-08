@@ -194,6 +194,7 @@
                         <ul class="submenu">
                             <li><a href="coding-task.html">赋码任务</a></li>
                             <li><a href="code-contrast.html">标签对照</a></li>
+                            <li><a href="barcode.html">条码管理</a></li>
                         </ul>
                     </li>
                     <li class="nav-item has-submenu">
@@ -242,6 +243,7 @@
                         </a>
                         <ul class="submenu">
                             <li><a href="query.html" class="">业务查询</a></li>
+                            <li><a href="secondary-inbound.html" class="">二级库入库记录查询</a></li>
                             <li><a href="report.html" class="">统计报表</a></li>
                             
                             <li><a href="warning.html" class="">预警记录</a></li>
@@ -403,6 +405,10 @@
                             加工单列表
                         </h3>
                         <div class="card-actions">
+                            <button class="btn btn-text" title="导出">
+                                <i class="fas fa-download"></i>
+                                导出
+                            </button>
                             <button class="btn btn-text" title="刷新">
                                 <i class="fas fa-sync-alt"></i>
                             </button>
@@ -761,6 +767,10 @@
                     标记异常
                 </button>
                 <button class="btn btn-success">完成加工</button>
+                <button class="btn btn-primary" onclick="window.App && App.toast ? App.toast.success('已发送打印任务') : alert('已发送打印任务')">
+                    <i class="fas fa-print"></i>
+                    打印
+                </button>
             </div>
         </div>
     </div>

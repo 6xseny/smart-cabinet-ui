@@ -13,7 +13,7 @@
         /* ---- 页面特有样式 ---- */
         .monitor-summary {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: var(--space-5);
             margin-bottom: var(--space-6);
         }
@@ -88,8 +88,6 @@
         }
         .filter-btn:hover, .filter-btn.active { border-color: var(--primary-500); color: var(--primary-400); background: rgba(0,191,255,0.08); }
         .filter-btn .count { background: var(--primary-500); color: #fff; border-radius: var(--radius-full); padding: 1px 7px; font-size: var(--text-xs); font-weight: 600; }
-        .filter-btn.warning-btn.active { border-color: var(--warning); color: var(--warning); background: rgba(255,204,0,0.08); }
-        .filter-btn.warning-btn .count { background: var(--warning); color: #000; }
         .filter-btn.offline-btn.active { border-color: var(--error); color: var(--error); background: rgba(255,51,102,0.08); }
         .filter-btn.offline-btn .count { background: var(--error); }
 
@@ -119,7 +117,7 @@
         /* 设备网格 */
         .device-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(3, 1fr);
             gap: var(--space-4);
         }
 
@@ -518,6 +516,7 @@
                         <ul class="submenu">
                             <li><a href="coding-task.html">赋码任务</a></li>
                             <li><a href="code-contrast.html">标签对照</a></li>
+                            <li><a href="barcode.html">条码管理</a></li>
                         </ul>
                     </li>
                     <li class="nav-item has-submenu">
@@ -564,6 +563,7 @@
                         </a>
                         <ul class="submenu">
                             <li><a href="query.html" class="">业务查询</a></li>
+                            <li><a href="secondary-inbound.html" class="">二级库入库记录查询</a></li>
                             <li><a href="report.html" class="">统计报表</a></li>
                             
                             <li><a href="warning.html" class="">预警记录</a></li>
@@ -658,17 +658,9 @@
                 <div class="summary-card">
                     <div class="summary-icon online"><i class="fas fa-wifi"></i></div>
                     <div class="summary-info">
-                        <div class="summary-value" style="color:var(--success);">45</div>
+                        <div class="summary-value" style="color:var(--success);">47</div>
                         <div class="summary-label">在线设备</div>
-                        <div class="summary-rate up"><i class="fas fa-arrow-up" style="margin-right:3px;"></i>在线率 93.8%</div>
-                    </div>
-                </div>
-                <div class="summary-card">
-                    <div class="summary-icon warning"><i class="fas fa-exclamation-triangle"></i></div>
-                    <div class="summary-info">
-                        <div class="summary-value" style="color:var(--warning);">2</div>
-                        <div class="summary-label">预警设备</div>
-                        <div class="summary-rate warn"><i class="fas fa-clock" style="margin-right:3px;"></i>需及时处理</div>
+                        <div class="summary-rate up"><i class="fas fa-arrow-up" style="margin-right:3px;"></i>在线率 97.9%</div>
                     </div>
                 </div>
                 <div class="summary-card">
@@ -688,10 +680,7 @@
                         <i class="fas fa-th-large"></i> 全部 <span class="count">48</span>
                     </button>
                     <button class="filter-btn" id="filterOnline" onclick="filterDevices('online')">
-                        <i class="fas fa-wifi" style="color:var(--success);"></i> 在线 <span class="count" style="background:var(--success);">45</span>
-                    </button>
-                    <button class="filter-btn warning-btn" id="filterWarning" onclick="filterDevices('warning')">
-                        <i class="fas fa-exclamation-triangle" style="color:var(--warning);"></i> 预警 <span class="count">2</span>
+                        <i class="fas fa-wifi" style="color:var(--success);"></i> 在线 <span class="count" style="background:var(--success);">47</span>
                     </button>
                     <button class="filter-btn offline-btn" id="filterOffline" onclick="filterDevices('offline')">
                         <i class="fas fa-times-circle" style="color:var(--error);"></i> 离线 <span class="count">1</span>
@@ -764,7 +753,7 @@ const DEVICES = [
     { id:'B02', name:'急诊室-主柜-B02', dept:'急诊', location:'急诊科 1层 留观室', status:'online', ip:'192.168.1.112', firmware:'v2.3.0', stock:61, capacity:80, lastSync:'5分钟前', uptime:'98.7%', temp:'35°C', events:[{type:'ok',msg:'库存同步完成',time:'10:00'}] },
     { id:'B03', name:'急诊室-副柜-B03', dept:'急诊', location:'急诊科 1层', status:'online', ip:'192.168.1.113', firmware:'v2.3.0', stock:68, capacity:80, lastSync:'2分钟前', uptime:'99.2%', temp:'35°C', events:[{type:'ok',msg:'设备在线',time:'10:02'}] },
     { id:'C01', name:'ICU-主柜-C01', dept:'ICU', location:'2号住院楼 5层 ICU-A区', status:'online', ip:'192.168.1.121', firmware:'v2.3.1', stock:91, capacity:100, lastSync:'1分钟前', uptime:'99.9%', temp:'36°C', events:[{type:'ok',msg:'设备自检通过',time:'10:05'}] },
-    { id:'C02', name:'ICU-主柜-C02', dept:'ICU', location:'2号住院楼 5层 ICU-B区', status:'warning', ip:'192.168.1.122', firmware:'v2.2.9', stock:23, capacity:100, lastSync:'15分钟前', uptime:'94.2%', temp:'42°C', events:[{type:'err',msg:'温度异常，超过阈值',time:'09:50'},{type:'warn',msg:'库存严重不足',time:'09:30'},{type:'ok',msg:'上次自检通过',time:'08:00'}] },
+    { id:'C02', name:'ICU-主柜-C02', dept:'ICU', location:'2号住院楼 5层 ICU-B区', status:'online', ip:'192.168.1.122', firmware:'v2.2.9', stock:23, capacity:100, lastSync:'15分钟前', uptime:'94.2%', temp:'42°C', events:[{type:'err',msg:'温度异常，超过阈值',time:'09:50'},{type:'warn',msg:'库存严重不足',time:'09:30'},{type:'ok',msg:'上次自检通过',time:'08:00'}] },
     { id:'C03', name:'ICU-副柜-C03', dept:'ICU', location:'2号住院楼 5层 ICU-C区', status:'online', ip:'192.168.1.123', firmware:'v2.3.1', stock:78, capacity:80, lastSync:'3分钟前', uptime:'99.1%', temp:'35°C', events:[{type:'ok',msg:'库存同步完成',time:'09:58'}] },
     { id:'D01', name:'骨科-主柜-D01', dept:'骨科', location:'2号住院楼 3层 骨科护士站', status:'online', ip:'192.168.1.131', firmware:'v2.3.0', stock:65, capacity:80, lastSync:'4分钟前', uptime:'98.5%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'09:55'}] },
     { id:'D02', name:'骨科-主柜-D02', dept:'骨科', location:'2号住院楼 3层 骨科手术备料', status:'online', ip:'192.168.1.132', firmware:'v2.3.0', stock:48, capacity:80, lastSync:'6分钟前', uptime:'97.8%', temp:'35°C', events:[{type:'warn',msg:'库存低于预警值',time:'09:40'}] },
@@ -781,7 +770,7 @@ const DEVICES = [
     { id:'G02', name:'神外-副柜-G02', dept:'神经外科', location:'3号住院楼 2层 神外手术', status:'online', ip:'192.168.1.162', firmware:'v2.3.0', stock:62, capacity:80, lastSync:'5分钟前', uptime:'98.8%', temp:'35°C', events:[{type:'ok',msg:'设备正常',time:'09:45'}] },
     { id:'H01', name:'呼吸科-主柜-H01', dept:'呼吸科', location:'1号住院楼 5层 呼吸科', status:'online', ip:'192.168.1.171', firmware:'v2.3.1', stock:85, capacity:100, lastSync:'2分钟前', uptime:'99.5%', temp:'35°C', events:[{type:'ok',msg:'同步完成',time:'10:02'}] },
     { id:'H02', name:'呼吸科-副柜-H02', dept:'呼吸科', location:'1号住院楼 5层 呼吸ICU', status:'online', ip:'192.168.1.172', firmware:'v2.3.0', stock:67, capacity:80, lastSync:'4分钟前', uptime:'98.7%', temp:'35°C', events:[{type:'ok',msg:'设备正常',time:'09:50'}] },
-    { id:'H03', name:'呼吸科-副柜-H03', dept:'呼吸科', location:'1号住院楼 5层 雾化室', status:'warning', ip:'192.168.1.173', firmware:'v2.2.9', stock:18, capacity:80, lastSync:'20分钟前', uptime:'91.3%', temp:'38°C', events:[{type:'warn',msg:'库存严重不足，请及时补货',time:'09:40'},{type:'warn',msg:'同步延迟超过阈值',time:'09:20'}] },
+    { id:'H03', name:'呼吸科-副柜-H03', dept:'呼吸科', location:'1号住院楼 5层 雾化室', status:'online', ip:'192.168.1.173', firmware:'v2.2.9', stock:18, capacity:80, lastSync:'20分钟前', uptime:'91.3%', temp:'38°C', events:[{type:'warn',msg:'库存严重不足，请及时补货',time:'09:40'},{type:'warn',msg:'同步延迟超过阈值',time:'09:20'}] },
     { id:'I01', name:'消化科-主柜-I01', dept:'消化科', location:'2号住院楼 2层 消化科', status:'online', ip:'192.168.1.181', firmware:'v2.3.1', stock:77, capacity:100, lastSync:'3分钟前', uptime:'99.3%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'10:00'}] },
     { id:'I02', name:'消化科-副柜-I02', dept:'消化科', location:'2号住院楼 2层 内镜室', status:'online', ip:'192.168.1.182', firmware:'v2.3.0', stock:59, capacity:80, lastSync:'6分钟前', uptime:'98.4%', temp:'35°C', events:[{type:'ok',msg:'设备正常',time:'09:45'}] },
     { id:'J01', name:'泌尿外科-主柜-J01', dept:'泌尿外科', location:'3号住院楼 3层 泌尿外科', status:'online', ip:'192.168.1.191', firmware:'v2.3.1', stock:81, capacity:100, lastSync:'2分钟前', uptime:'99.7%', temp:'35°C', events:[{type:'ok',msg:'自检通过',time:'10:03'}] },
@@ -818,7 +807,7 @@ let currentDept = '';
 let currentSearch = '';
 
 function getStatusLabel(s) {
-    return { online:'在线', warning:'预警', offline:'离线' }[s];
+    return { online:'在线', offline:'离线' }[s];
 }
 
 function getStockColor(stock, capacity) {
@@ -920,8 +909,8 @@ function applyFilters() {
 
 function filterDevices(status) {
     currentFilter = status;
-    ['filterAll','filterOnline','filterWarning','filterOffline'].forEach(id => document.getElementById(id)?.classList.remove('active'));
-    const map = { all:'filterAll', online:'filterOnline', warning:'filterWarning', offline:'filterOffline' };
+    ['filterAll','filterOnline','filterOffline'].forEach(id => document.getElementById(id)?.classList.remove('active'));
+    const map = { all:'filterAll', online:'filterOnline', offline:'filterOffline' };
     document.getElementById(map[status])?.classList.add('active');
     applyFilters();
 }
@@ -952,7 +941,7 @@ function openDrawer(id) {
 
     const stockColor = getStockColor(d.stock, d.capacity);
     const stockPct = Math.round(d.stock / d.capacity * 100);
-    const statusMap = { online:'<span style="color:var(--success);">● 在线</span>', warning:'<span style="color:var(--warning);">● 预警</span>', offline:'<span style="color:var(--error);">● 离线</span>' };
+    const statusMap = { online:'<span style="color:var(--success);">● 在线</span>', offline:'<span style="color:var(--error);">● 离线</span>' };
 
     document.getElementById('drawerBody').innerHTML = `
         <div class="drawer-section">

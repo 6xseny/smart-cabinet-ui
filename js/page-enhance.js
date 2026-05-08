@@ -34,8 +34,11 @@
             });
         });
 
-        // 编辑按钮
+        // 编辑按钮 - 跳过已有自定义onclick处理的按钮
         document.querySelectorAll('.btn-edit, .table-actions .btn-icon[title="编辑"]').forEach(btn => {
+            // 如果按钮已有自己的onclick属性（各页面自定义编辑逻辑），不添加通用处理
+            if (btn.hasAttribute('onclick')) return;
+
             btn.addEventListener('click', function(e) {
                 e.stopPropagation();
                 const row = this.closest('tr');

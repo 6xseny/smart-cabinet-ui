@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>盘点管理 - 智能柜后台管理系统</title>
+    <title>二级库入库记录查询 - 智能柜后台管理系统</title>
     <link rel="stylesheet" href="../css/variables.css">
     <link rel="stylesheet" href="../css/base.css">
     <link rel="stylesheet" href="../css/components.css">
@@ -111,6 +111,52 @@
         .user-dropdown.active .fa-chevron-down {
             transform: rotate(180deg);
         }
+
+        .main-content,
+        .page-content,
+        .card {
+            min-width: 0;
+        }
+        .main-content {
+            width: calc(100vw - 260px);
+            max-width: calc(100vw - 260px);
+            overflow-x: hidden;
+        }
+        .main-content.expanded {
+            width: calc(100vw - 70px);
+            max-width: calc(100vw - 70px);
+        }
+        .secondary-inbound-table-container {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: scroll;
+            overflow-y: hidden;
+            padding-bottom: 8px;
+        }
+        .secondary-inbound-table-container::-webkit-scrollbar {
+            height: 10px;
+        }
+        .secondary-inbound-table-container::-webkit-scrollbar-track {
+            background: rgba(15, 30, 58, 0.8);
+            border-radius: 999px;
+        }
+        .secondary-inbound-table-container::-webkit-scrollbar-thumb {
+            background: linear-gradient(90deg, var(--neon-cyan), var(--neon-purple));
+            border-radius: 999px;
+            box-shadow: 0 0 8px rgba(0, 191, 255, 0.35);
+        }
+        .secondary-inbound-table {
+            min-width: 1680px;
+        }
+        .secondary-inbound-table th,
+        .secondary-inbound-table td {
+            white-space: nowrap;
+        }
+        .secondary-inbound-table td.remark-cell {
+            white-space: normal;
+            min-width: 160px;
+            max-width: 220px;
+        }
 </style>
 </head>
 <body>
@@ -201,7 +247,7 @@
                         </a>
                         <ul class="submenu">
                             <li><a href="query.html" class="">业务查询</a></li>
-                            <li><a href="secondary-inbound.html" class="">二级库入库记录查询</a></li>
+                            <li><a href="secondary-inbound.html" class="active">二级库入库记录查询</a></li>
                             <li><a href="report.html" class="">统计报表</a></li>
                             
                             <li><a href="warning.html" class="">预警记录</a></li>
@@ -218,9 +264,9 @@
                     <i class="fas fa-bars"></i>
                 </button>
                 <div class="breadcrumb">
-                    <span>库存管理</span>
+                    <span>统计分析</span>
                     <i class="fas fa-chevron-right"></i>
-                    <span class="current">盘点管理</span>
+                    <span class="current">二级库入库记录查询</span>
                 </div>
                 <div class="header-right">
                     <div class="search-box">
@@ -264,52 +310,46 @@
             <div class="page-content">
                 <div class="page-header">
                     <div>
-                        <h1 class="page-title">盘点管理</h1>
-                        <p class="page-desc">创建盘点任务，执行库存盘点，处理盘点差异</p>
+                        <h1 class="page-title">二级库入库记录查询</h1>
+                        <p class="page-desc">查询二级库入库验收记录，支持按验收单号、商品、供应商等条件检索</p>
                     </div>
                     <div class="page-actions">
-                        <button class="btn btn-primary" onclick="openAddStocktakingTaskModal()">
-                            <i class="fas fa-plus"></i>
-                            新建盘点任务
+                        <button class="btn btn-text" title="导出">
+                            <i class="fas fa-download"></i>
+                            导出
                         </button>
                     </div>
                 </div>
 
-                <div class="stats-grid">
-                    <div class="stat-card">
-                        <div class="stat-icon blue">
-                            <i class="fas fa-clipboard-check"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value">3</div>
-                            <div class="stat-label">待盘点</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon orange">
-                            <i class="fas fa-spinner"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value">2</div>
-                            <div class="stat-label">盘点中</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon green">
-                            <i class="fas fa-check-circle"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value">15</div>
-                            <div class="stat-label">已完成</div>
-                        </div>
-                    </div>
-                    <div class="stat-card">
-                        <div class="stat-icon red">
-                            <i class="fas fa-exclamation-triangle"></i>
-                        </div>
-                        <div class="stat-info">
-                            <div class="stat-value">1</div>
-                            <div class="stat-label">有差异</div>
+                <div class="card" style="margin-bottom: 20px;">
+                    <div class="card-body">
+                        <div class="filter-row">
+                            <div class="filter-item">
+                                <label>开始日期</label>
+                                <input type="date" class="form-input">
+                            </div>
+                            <div class="filter-item">
+                                <label>结束日期</label>
+                                <input type="date" class="form-input">
+                            </div>
+                            <div class="filter-item">
+                                <label>物资属性</label>
+                                <select class="form-select">
+                                    <option value="">全部</option>
+                                    <option value="耗材">耗材</option>
+                                    <option value="药品">药品</option>
+                                    <option value="器械">器械</option>
+                                </select>
+                            </div>
+                            <div class="filter-item search-item">
+                                <label>关键词</label>
+                                <div class="search-input-group">
+                                    <input type="text" class="form-input" placeholder="验收单号/商品名称/供应商">
+                                    <button class="btn btn-primary">
+                                        <i class="fas fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -318,53 +358,96 @@
                     <div class="card-header">
                         <h3 class="card-title">
                             <i class="fas fa-list"></i>
-                            盘点任务列表
+                            入库记录列表
                         </h3>
+                        <div class="card-actions">
+                            <button class="btn btn-text" title="刷新">
+                                <i class="fas fa-sync-alt"></i>
+                            </button>
+                            <button class="btn btn-text" title="列设置">
+                                <i class="fas fa-cog"></i>
+                            </button>
+                        </div>
                     </div>
-                    <div class="table-container">
-                        <table class="data-table">
+                    <div class="table-container secondary-inbound-table-container">
+                        <table class="data-table secondary-inbound-table">
                             <thead>
                                 <tr>
-                                    <th>任务编号</th>
-                                    <th>任务名称</th>
-                                    <th>盘点范围</th>
-                                    <th>计划时间</th>
-                                    <th>盘点人</th>
-                                    <th>状态</th>
-                                    <th>差异</th>
-                                    <th>操作</th>
+                                    <th>验收单号</th>
+                                    <th>商品名称</th>
+                                    <th>物资代码</th>
+                                    <th>数量</th>
+                                    <th>规格型号</th>
+                                    <th>品牌</th>
+                                    <th>生产厂家</th>
+                                    <th>供应商</th>
+                                    <th>物资属性</th>
+                                    <th>生产日期</th>
+                                    <th>效期</th>
+                                    <th>批号</th>
+                                    <th>备注</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><span class="code">STK2024001</span></td>
-                                    <td>手术室月度盘点</td>
-                                    <td>手术室-主柜</td>
-                                    <td>2024-01-20</td>
-                                    <td>张护士</td>
-                                    <td><span class="badge badge-blue">待盘点</span></td>
-                                    <td>-</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="开始"><i class="fas fa-play"></i></button>
-                                        </div>
-                                    </td>
+                                    <td><span class="code">YS20260508001</span></td>
+                                    <td>一次性使用无菌注射器</td>
+                                    <td>WZ-HC-0001</td>
+                                    <td>500</td>
+                                    <td>5ml 带针</td>
+                                    <td>威高</td>
+                                    <td>山东威高集团</td>
+                                    <td>国药控股</td>
+                                    <td><span class="badge badge-blue">耗材</span></td>
+                                    <td>2026-04-12</td>
+                                    <td>2028-04-11</td>
+                                    <td>WG260412A</td>
+                                    <td class="remark-cell">二级库常规补充入库</td>
                                 </tr>
                                 <tr>
-                                    <td><span class="code">STK2024002</span></td>
-                                    <td>急诊科季度盘点</td>
-                                    <td>急诊科-全部</td>
-                                    <td>2024-01-18</td>
-                                    <td>李医生</td>
-                                    <td><span class="badge badge-orange">盘点中</span></td>
-                                    <td>-</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="继续"><i class="fas fa-forward"></i></button>
-                                        </div>
-                                    </td>
+                                    <td><span class="code">YS20260508002</span></td>
+                                    <td>头孢呋辛钠注射液</td>
+                                    <td>WZ-YP-0032</td>
+                                    <td>120</td>
+                                    <td>0.75g/瓶</td>
+                                    <td>华北</td>
+                                    <td>华北制药</td>
+                                    <td>上药控股</td>
+                                    <td><span class="badge badge-purple">药品</span></td>
+                                    <td>2026-03-20</td>
+                                    <td>2027-03-19</td>
+                                    <td>HB260320B</td>
+                                    <td class="remark-cell">冷链核验通过</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="code">YS20260508003</span></td>
+                                    <td>医用纱布块</td>
+                                    <td>WZ-HC-0048</td>
+                                    <td>800</td>
+                                    <td>8×10cm 灭菌</td>
+                                    <td>稳健</td>
+                                    <td>稳健医疗</td>
+                                    <td>九州通</td>
+                                    <td><span class="badge badge-blue">耗材</span></td>
+                                    <td>2026-04-01</td>
+                                    <td>2029-03-31</td>
+                                    <td>WJ260401C</td>
+                                    <td class="remark-cell">包装完好，数量一致</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="code">YS20260508004</span></td>
+                                    <td>手术刀片</td>
+                                    <td>WZ-QX-0015</td>
+                                    <td>300</td>
+                                    <td>10# 碳钢型</td>
+                                    <td>上械</td>
+                                    <td>上海医疗器械</td>
+                                    <td>华润医药</td>
+                                    <td><span class="badge badge-green">器械</span></td>
+                                    <td>2026-02-18</td>
+                                    <td>2031-02-17</td>
+                                    <td>SX260218D</td>
+                                    <td class="remark-cell">抽检合格</td>
                                 </tr>
                             </tbody>
                         </table>

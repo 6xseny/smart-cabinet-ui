@@ -571,6 +571,7 @@
                         <ul class="submenu">
                             <li><a href="coding-task.html">赋码任务</a></li>
                             <li><a href="code-contrast.html">标签对照</a></li>
+                            <li><a href="barcode.html">条码管理</a></li>
                         </ul>
                     </li>
                     <li class="nav-item has-submenu">
@@ -619,6 +620,7 @@
                         </a>
                         <ul class="submenu">
                             <li><a href="query.html" class="">业务查询</a></li>
+                            <li><a href="secondary-inbound.html" class="">二级库入库记录查询</a></li>
                             <li><a href="report.html" class="">统计报表</a></li>
                             
                             <li><a href="warning.html" class="">预警记录</a></li>
@@ -1183,6 +1185,9 @@
                     <td><span class="badge ${d.status === 'active' ? 'badge-success' : 'badge-warning'}">${d.status === 'active' ? '正常' : '停用'}</span></td>
                     <td>
                         <button class="btn btn-sm btn-ghost" onclick="editDepartment('${d.id}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn btn-sm btn-ghost" onclick="toggleDepartmentStatus('${d.id}')" title="${d.status === 'active' ? '停用' : '启用'}">
+                            <i class="fas ${d.status === 'active' ? 'fa-ban' : 'fa-check'}"></i>
+                        </button>
                         <button class="btn btn-sm btn-ghost" onclick="deleteDepartment('${d.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>
@@ -1277,6 +1282,15 @@
             renderDepartments();
             renderHospitals(); // 更新院区统计
             closeDepartmentModal();
+        }
+
+        function toggleDepartmentStatus(id) {
+            const dept = departmentData.find(d => d.id === id);
+            if (!dept) return;
+
+            dept.status = dept.status === 'active' ? 'inactive' : 'active';
+            renderDepartments();
+            Toast.success(`部门已${dept.status === 'active' ? '启用' : '停用'}`);
         }
 
         function deleteDepartment(id) {

@@ -111,6 +111,154 @@
         .user-dropdown.active .fa-chevron-down {
             transform: rotate(180deg);
         }
+
+        .product-table-shell {
+            display: grid;
+            grid-template-columns: minmax(0, 1fr) 132px;
+            align-items: start;
+            width: 100%;
+            overflow: hidden;
+        }
+
+        .product-table-main {
+            width: 100%;
+            min-width: 0;
+            overflow-x: scroll;
+            overflow-y: hidden;
+            padding-bottom: 8px;
+            scrollbar-gutter: stable;
+        }
+
+        .product-table-main::-webkit-scrollbar {
+            height: 10px;
+        }
+
+        .product-table-main::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.06);
+            border-radius: 999px;
+        }
+
+        .product-table-main::-webkit-scrollbar-thumb {
+            background: rgba(0, 191, 255, 0.45);
+            border-radius: 999px;
+        }
+
+        .product-table-main::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 191, 255, 0.7);
+        }
+
+        .product-table-main .data-table {
+            min-width: 1680px;
+            width: max-content;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 12px;
+        }
+
+        .product-table-main .data-table th,
+        .product-table-main .data-table td {
+            padding: 10px 12px;
+            white-space: nowrap;
+        }
+
+        .product-table-main .data-table th:nth-child(1),
+        .product-table-main .data-table td:nth-child(1) { min-width: 150px; }
+        .product-table-main .data-table th:nth-child(2),
+        .product-table-main .data-table td:nth-child(2) { min-width: 72px; }
+        .product-table-main .data-table th:nth-child(3),
+        .product-table-main .data-table td:nth-child(3) { min-width: 90px; }
+        .product-table-main .data-table th:nth-child(4),
+        .product-table-main .data-table td:nth-child(4) { min-width: 90px; }
+        .product-table-main .data-table th:nth-child(5),
+        .product-table-main .data-table td:nth-child(5) { min-width: 76px; }
+        .product-table-main .data-table th:nth-child(6),
+        .product-table-main .data-table td:nth-child(6) { min-width: 70px; }
+        .product-table-main .data-table th:nth-child(7),
+        .product-table-main .data-table td:nth-child(7) { min-width: 120px; }
+        .product-table-main .data-table th:nth-child(8),
+        .product-table-main .data-table td:nth-child(8) { min-width: 80px; }
+        .product-table-main .data-table th:nth-child(9),
+        .product-table-main .data-table td:nth-child(9) { min-width: 100px; }
+        .product-table-main .data-table th:nth-child(10),
+        .product-table-main .data-table td:nth-child(10),
+        .product-table-main .data-table th:nth-child(12),
+        .product-table-main .data-table td:nth-child(12) { min-width: 132px; }
+        .product-table-main .data-table th:nth-child(11),
+        .product-table-main .data-table td:nth-child(11),
+        .product-table-main .data-table th:nth-child(13),
+        .product-table-main .data-table td:nth-child(13) { min-width: 72px; }
+        .product-table-main .data-table th:nth-child(14),
+        .product-table-main .data-table td:nth-child(14) { min-width: 80px; }
+        .product-table-main .data-table th:nth-child(15),
+        .product-table-main .data-table td:nth-child(15) { min-width: 160px; }
+
+        .product-table-fixed {
+            width: 132px;
+            min-width: 132px;
+            border-left: 1px solid rgba(0, 191, 255, 0.12);
+            background: linear-gradient(90deg, rgba(16, 28, 58, 0.88) 0%, rgba(20, 34, 68, 0.96) 18%, var(--bg-card) 100%);
+            box-shadow: -4px 0 12px rgba(0, 0, 0, 0.18);
+            z-index: 3;
+            position: relative;
+        }
+
+        .product-table-fixed::before {
+            content: '';
+            position: absolute;
+            left: -14px;
+            top: 0;
+            width: 14px;
+            height: 100%;
+            pointer-events: none;
+            background: linear-gradient(90deg, rgba(10, 18, 38, 0) 0%, rgba(10, 18, 38, 0.78) 100%);
+        }
+
+        .product-table-fixed .data-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0;
+            font-size: 12px;
+            table-layout: fixed;
+        }
+
+        .product-table-fixed .data-table th,
+        .product-table-fixed .data-table td {
+            padding: 10px 6px;
+            white-space: nowrap;
+            text-align: center;
+        }
+
+        .product-table-fixed .table-actions {
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: nowrap;
+        }
+
+        .product-table-shell .data-table tbody td {
+            height: 64px;
+            box-sizing: border-box;
+            vertical-align: middle;
+        }
+
+        .product-table-fixed th {
+            position: sticky;
+            top: 0;
+            z-index: 12;
+        }
+
+        .product-table-fixed td,
+        .product-table-fixed th {
+            background: var(--bg-card);
+        }
+
+        .product-table-shell tbody tr:hover td {
+            background: rgba(0, 191, 255, 0.05);
+        }
+
+        .product-table-fixed tbody tr:hover td {
+            background: rgba(0, 191, 255, 0.05);
+        }
 </style>
 </head>
 <body>
@@ -153,6 +301,7 @@
                         <ul class="submenu">
                             <li><a href="coding-task.html">赋码任务</a></li>
                             <li><a href="code-contrast.html">标签对照</a></li>
+                            <li><a href="barcode.html">条码管理</a></li>
                         </ul>
                     </li>
                     <li class="nav-item has-submenu">
@@ -201,6 +350,7 @@
                         </a>
                         <ul class="submenu">
                             <li><a href="query.html" class="">业务查询</a></li>
+                            <li><a href="secondary-inbound.html" class="">二级库入库记录查询</a></li>
                             <li><a href="report.html" class="">统计报表</a></li>
                             
                             <li><a href="warning.html" class="">预警记录</a></li>
@@ -391,228 +541,203 @@
                             </button>
                         </div>
                     </div>
-                    <div class="table-container">
-                        <table class="data-table">
-                            <thead>
-                                <tr>
-                                    <th width="40">
-                                        <input type="checkbox" class="checkbox-all">
-                                    </th>
-                                    <th>商品编码</th>
-                                    <th>商品名称</th>
-                                    <th>类型</th>
-                                    <th>规格</th>
-                                    <th>单位</th>
-                                    <th>生产厂家</th>
-                                    <th>赋码状态</th>
-                                    <th>状态</th>
-                                    <th>更新时间</th>
-                                    <th width="150">操作</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr>
-                                    <td><input type="checkbox" class="checkbox-item"></td>
-                                    <td><span class="code">SP20240001</span></td>
-                                    <td>
-                                        <div class="product-info">
-                                            <div class="product-name">一次性使用无菌注射器</div>
-                                            <div class="product-spec">5ml 带针</div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge badge-blue">耗材</span></td>
-                                    <td>5ml</td>
-                                    <td>支</td>
-                                    <td>山东威高集团</td>
-                                    <td><span class="status-dot success"></span>已赋码</td>
-                                    <td><span class="badge badge-green">启用</span></td>
-                                    <td>2024-01-15 14:30</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="btn-icon" title="赋码"><i class="fas fa-qrcode"></i></button>
-                                            <button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" class="checkbox-item"></td>
-                                    <td><span class="code">SP20240002</span></td>
-                                    <td>
-                                        <div class="product-info">
-                                            <div class="product-name">头孢呋辛钠注射液</div>
-                                            <div class="product-spec">0.75g/瓶</div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge badge-purple">药品</span></td>
-                                    <td>0.75g</td>
-                                    <td>瓶</td>
-                                    <td>华北制药</td>
-                                    <td><span class="status-dot success"></span>已赋码</td>
-                                    <td><span class="badge badge-green">启用</span></td>
-                                    <td>2024-01-14 09:15</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="btn-icon" title="赋码"><i class="fas fa-qrcode"></i></button>
-                                            <button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" class="checkbox-item"></td>
-                                    <td><span class="code">SP20240003</span></td>
-                                    <td>
-                                        <div class="product-info">
-                                            <div class="product-name">医用纱布块</div>
-                                            <div class="product-spec">8×10cm 灭菌</div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge badge-blue">耗材</span></td>
-                                    <td>8×10cm</td>
-                                    <td>包</td>
-                                    <td>稳健医疗</td>
-                                    <td><span class="status-dot warning"></span>未赋码</td>
-                                    <td><span class="badge badge-green">启用</span></td>
-                                    <td>2024-01-13 16:45</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="btn-icon primary" title="赋码"><i class="fas fa-qrcode"></i></button>
-                                            <button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" class="checkbox-item"></td>
-                                    <td><span class="code">SP20240004</span></td>
-                                    <td>
-                                        <div class="product-info">
-                                            <div class="product-name">手术刀片</div>
-                                            <div class="product-spec">10# 碳钢</div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge badge-blue">耗材</span></td>
-                                    <td>10#</td>
-                                    <td>片</td>
-                                    <td>上海医疗器械</td>
-                                    <td><span class="status-dot success"></span>已赋码</td>
-                                    <td><span class="badge badge-gray">停用</span></td>
-                                    <td>2024-01-12 11:20</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="btn-icon" title="赋码"><i class="fas fa-qrcode"></i></button>
-                                            <button class="btn-icon success" title="启用"><i class="fas fa-check"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" class="checkbox-item"></td>
-                                    <td><span class="code">SP20240005</span></td>
-                                    <td>
-                                        <div class="product-info">
-                                            <div class="product-name">氯化钠注射液</div>
-                                            <div class="product-spec">0.9% 250ml</div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge badge-purple">药品</span></td>
-                                    <td>250ml</td>
-                                    <td>瓶</td>
-                                    <td>石家庄四药</td>
-                                    <td><span class="status-dot success"></span>已赋码</td>
-                                    <td><span class="badge badge-green">启用</span></td>
-                                    <td>2024-01-11 08:30</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="btn-icon" title="赋码"><i class="fas fa-qrcode"></i></button>
-                                            <button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" class="checkbox-item"></td>
-                                    <td><span class="code">SP20240006</span></td>
-                                    <td>
-                                        <div class="product-info">
-                                            <div class="product-name">一次性使用输液器</div>
-                                            <div class="product-spec">精密过滤型</div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge badge-blue">耗材</span></td>
-                                    <td>普通型</td>
-                                    <td>套</td>
-                                    <td>山东威高集团</td>
-                                    <td><span class="status-dot warning"></span>未赋码</td>
-                                    <td><span class="badge badge-green">启用</span></td>
-                                    <td>2024-01-10 15:00</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="btn-icon primary" title="赋码"><i class="fas fa-qrcode"></i></button>
-                                            <button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" class="checkbox-item"></td>
-                                    <td><span class="code">SP20240007</span></td>
-                                    <td>
-                                        <div class="product-info">
-                                            <div class="product-name">阿莫西林胶囊</div>
-                                            <div class="product-spec">0.25g×24粒</div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge badge-purple">药品</span></td>
-                                    <td>0.25g</td>
-                                    <td>盒</td>
-                                    <td>哈药集团</td>
-                                    <td><span class="status-dot success"></span>已赋码</td>
-                                    <td><span class="badge badge-green">启用</span></td>
-                                    <td>2024-01-09 10:45</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="btn-icon" title="赋码"><i class="fas fa-qrcode"></i></button>
-                                            <button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td><input type="checkbox" class="checkbox-item"></td>
-                                    <td><span class="code">SP20240008</span></td>
-                                    <td>
-                                        <div class="product-info">
-                                            <div class="product-name">医用外科口罩</div>
-                                            <div class="product-spec">无菌 挂耳式</div>
-                                        </div>
-                                    </td>
-                                    <td><span class="badge badge-blue">耗材</span></td>
-                                    <td>成人</td>
-                                    <td>只</td>
-                                    <td>稳健医疗</td>
-                                    <td><span class="status-dot success"></span>已赋码</td>
-                                    <td><span class="badge badge-green">启用</span></td>
-                                    <td>2024-01-08 14:20</td>
-                                    <td>
-                                        <div class="table-actions">
-                                            <button class="btn-icon" title="查看"><i class="fas fa-eye"></i></button>
-                                            <button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button>
-                                            <button class="btn-icon" title="赋码"><i class="fas fa-qrcode"></i></button>
-                                            <button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            </tbody>
-                        </table>
+                    <div class="product-table-shell">
+                        <div class="table-container product-table-main">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>商品名称</th>
+                                        <th>类型</th>
+                                        <th>规格</th>
+                                        <th>型号</th>
+                                        <th>单价</th>
+                                        <th>单位</th>
+                                        <th>生产厂家</th>
+                                        <th>品牌</th>
+                                        <th>供应商</th>
+                                        <th>创建时间</th>
+                                        <th>创建人</th>
+                                        <th>修改时间</th>
+                                        <th>修改人</th>
+                                        <th>是否停用</th>
+                                        <th>备注</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td>一次性使用无菌注射器</td>
+                                        <td><span class="badge badge-blue">耗材</span></td>
+                                        <td>5ml</td>
+                                        <td>带针型</td>
+                                        <td>¥1.20</td>
+                                        <td>支</td>
+                                        <td>山东威高集团</td>
+                                        <td>威高</td>
+                                        <td>国药控股</td>
+                                        <td>2024-01-10 09:30</td>
+                                        <td>张敏</td>
+                                        <td>2024-01-15 14:30</td>
+                                        <td>李华</td>
+                                        <td><span class="badge badge-green">否</span></td>
+                                        <td>临床常用注射耗材</td>
+                                    </tr>
+                                    <tr>
+                                        <td>头孢呋辛钠注射液</td>
+                                        <td><span class="badge badge-purple">药品</span></td>
+                                        <td>0.75g/瓶</td>
+                                        <td>注射用</td>
+                                        <td>¥18.50</td>
+                                        <td>瓶</td>
+                                        <td>华北制药</td>
+                                        <td>华北</td>
+                                        <td>上药控股</td>
+                                        <td>2024-01-08 15:10</td>
+                                        <td>王芳</td>
+                                        <td>2024-01-14 09:15</td>
+                                        <td>赵磊</td>
+                                        <td><span class="badge badge-green">否</span></td>
+                                        <td>抗感染常备药品</td>
+                                    </tr>
+                                    <tr>
+                                        <td>医用纱布块</td>
+                                        <td><span class="badge badge-blue">耗材</span></td>
+                                        <td>8×10cm</td>
+                                        <td>灭菌型</td>
+                                        <td>¥6.80</td>
+                                        <td>包</td>
+                                        <td>稳健医疗</td>
+                                        <td>稳健</td>
+                                        <td>九州通</td>
+                                        <td>2024-01-07 11:20</td>
+                                        <td>陈静</td>
+                                        <td>2024-01-13 16:45</td>
+                                        <td>李娜</td>
+                                        <td><span class="badge badge-green">否</span></td>
+                                        <td>手术换药常用敷料</td>
+                                    </tr>
+                                    <tr>
+                                        <td>手术刀片</td>
+                                        <td><span class="badge badge-blue">耗材</span></td>
+                                        <td>10#</td>
+                                        <td>碳钢型</td>
+                                        <td>¥2.50</td>
+                                        <td>片</td>
+                                        <td>上海医疗器械</td>
+                                        <td>上械</td>
+                                        <td>华润医药</td>
+                                        <td>2024-01-06 10:00</td>
+                                        <td>刘洋</td>
+                                        <td>2024-01-12 11:20</td>
+                                        <td>赵磊</td>
+                                        <td><span class="badge badge-gray">是</span></td>
+                                        <td>外科切开专用刀片</td>
+                                    </tr>
+                                    <tr>
+                                        <td>氯化钠注射液</td>
+                                        <td><span class="badge badge-purple">药品</span></td>
+                                        <td>0.9% 250ml</td>
+                                        <td>软袋型</td>
+                                        <td>¥4.20</td>
+                                        <td>瓶</td>
+                                        <td>石家庄四药</td>
+                                        <td>四药</td>
+                                        <td>国控华北</td>
+                                        <td>2024-01-05 08:40</td>
+                                        <td>周倩</td>
+                                        <td>2024-01-11 08:30</td>
+                                        <td>孙涛</td>
+                                        <td><span class="badge badge-green">否</span></td>
+                                        <td>基础补液药品</td>
+                                    </tr>
+                                    <tr>
+                                        <td>一次性使用输液器</td>
+                                        <td><span class="badge badge-blue">耗材</span></td>
+                                        <td>普通型</td>
+                                        <td>精密过滤型</td>
+                                        <td>¥3.60</td>
+                                        <td>套</td>
+                                        <td>山东威高集团</td>
+                                        <td>威高</td>
+                                        <td>九州通</td>
+                                        <td>2024-01-04 14:25</td>
+                                        <td>王芳</td>
+                                        <td>2024-01-10 15:00</td>
+                                        <td>陈静</td>
+                                        <td><span class="badge badge-green">否</span></td>
+                                        <td>适用于常规静脉输液</td>
+                                    </tr>
+                                    <tr>
+                                        <td>阿莫西林胶囊</td>
+                                        <td><span class="badge badge-purple">药品</span></td>
+                                        <td>0.25g×24粒</td>
+                                        <td>胶囊剂</td>
+                                        <td>¥12.80</td>
+                                        <td>盒</td>
+                                        <td>哈药集团</td>
+                                        <td>哈药</td>
+                                        <td>上药控股</td>
+                                        <td>2024-01-03 09:50</td>
+                                        <td>李华</td>
+                                        <td>2024-01-09 10:45</td>
+                                        <td>周倩</td>
+                                        <td><span class="badge badge-green">否</span></td>
+                                        <td>门诊常用抗生素</td>
+                                    </tr>
+                                    <tr>
+                                        <td>医用外科口罩</td>
+                                        <td><span class="badge badge-blue">耗材</span></td>
+                                        <td>成人</td>
+                                        <td>无菌挂耳式</td>
+                                        <td>¥0.75</td>
+                                        <td>只</td>
+                                        <td>稳健医疗</td>
+                                        <td>稳健</td>
+                                        <td>国药控股</td>
+                                        <td>2024-01-02 13:35</td>
+                                        <td>孙涛</td>
+                                        <td>2024-01-08 14:20</td>
+                                        <td>刘洋</td>
+                                        <td><span class="badge badge-green">否</span></td>
+                                        <td>院感防护常用物资</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="product-table-fixed">
+                            <table class="data-table">
+                                <thead>
+                                    <tr>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr>
+                                        <td><div class="table-actions"><button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button><button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="table-actions"><button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button><button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="table-actions"><button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button><button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="table-actions"><button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button><button class="btn-icon success" title="启用"><i class="fas fa-check"></i></button></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="table-actions"><button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button><button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="table-actions"><button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button><button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="table-actions"><button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button><button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button></div></td>
+                                    </tr>
+                                    <tr>
+                                        <td><div class="table-actions"><button class="btn-icon" title="编辑"><i class="fas fa-edit"></i></button><button class="btn-icon danger" title="停用"><i class="fas fa-ban"></i></button></div></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
                     </div>
                     <div class="pagination">
                         <div class="pagination-info">
